@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="PinBox">
+        <item name="android:layout_width">20dp</item>
+        <item name="android:layout_height">20dp</item>
+        <item name="android:background">@drawable/bg_pin_box</item>
+        <item name="android:layout_margin">10dp</item>
+    </style>
+
+
+    <style name="KeypadButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">72dp</item>
+        <item name="android:layout_columnWeight">1</item>
+        <item name="android:layout_margin">10dp</item>
+        <item name="android:background">@drawable/bg_keypad_btn</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+    <style name="PinKey">
+        <item name="android:layout_width">@dimen/pin_btn_size</item>
+        <item name="android:layout_height">@dimen/pin_btn_size</item>
+        <item name="android:layout_margin">10dp</item>
+        <item name="android:background">@drawable/bg_keypad_circle</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+
+</resources>

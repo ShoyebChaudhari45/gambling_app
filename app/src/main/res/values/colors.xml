@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- PRIMARY THEME -->
+    <color name="colorPrimary">#6EC6FF</color>      <!-- Sky Blue -->
+    <color name="colorPrimaryDark">#4FA8E8</color>
+    <color name="colorAccent">#FFD966</color>       <!-- Light Yellow -->
+
+    <!-- BACKGROUNDS (UPDATED – NOT WHITE LOOKING) -->
+    <color name="bg_main">#FFF6E8</color>      <!-- Warm cream (noticeably different from white) -->
+    <color name="strip_bg">#FFE8B0</color>     <!-- Light yellow but visible -->
+    <color name="input_bg">#FFFFFF</color>     <!-- Inputs always white -->
+    <color name="splash_bg">#6EC6FF</color>    <!-- Sky blue (perfect, no change) -->
+
+    <!-- TEXT -->
+    <color name="textPrimary">#2B2B2B</color>
+    <color name="textSecondary">#6B6B6B</color>
+
+    <!-- COMMON -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#FF000000</color>
+    <color name="whatsapp_green">#25D366</color>
+
+</resources>
