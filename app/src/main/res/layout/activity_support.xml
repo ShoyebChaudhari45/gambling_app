@@ -1,0 +1,21 @@
+<LinearLayout
+    android:id="@+id/main"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <include
+        layout="@layout/item_support_row"
+        android:tag="call"/>
+
+    <include
+        layout="@layout/item_support_row"
+        android:tag="whatsapp"/>
+
+    <include
+        layout="@layout/item_support_row"
+        android:tag="telegram"/>
+
+</LinearLayout>

@@ -3,15 +3,39 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
-        android:forceDarkAllowed="false"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:forceDarkAllowed="false"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.GameApp">
+        <activity
+            android:name=".activities.SupportActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.GameRatesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.WinHistoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.BidHistoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.WalletStatementActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.WithdrawActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.AddPointsActivity"
+            android:exported="false" />
         <activity
             android:name=".activities.HomeActivity"
             android:exported="false" />
@@ -28,7 +52,6 @@
             android:name=".activities.SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.GameApp.Splash">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

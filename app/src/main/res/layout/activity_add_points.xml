@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F2F2F2">
+
+    <!-- ================= TOOLBAR ================= -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:background="@color/colorPrimary"
+        app:navigationIcon="@drawable/ic_back"
+        app:title="Add Points"
+        app:titleTextColor="@color/white"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- ================= CONTENT ================= -->
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp">
+
+            <!-- CURRENT POINTS -->
+            <ImageView
+                android:id="@+id/imgDiamond"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_diamond"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
+                android:id="@+id/txtPoints"
+                android:layout_width="wrap_content"
+                android:layout_height="28dp"
+                android:text="425"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="@color/textPrimary"
+                app:layout_constraintTop_toBottomOf="@id/imgDiamond"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
+                android:id="@+id/txtCurrent"
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:text="Current Points"
+                android:textSize="13sp"
+                android:textColor="@color/textSecondary"
+                app:layout_constraintTop_toBottomOf="@id/txtPoints"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <!-- NOTICE CARD -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardNotice"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="2dp"
+                app:layout_constraintTop_toBottomOf="@id/txtCurrent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorPrimary"
+                    android:padding="16dp"
+                    android:text="!!Add Fund Notice!!\n\nMINIMUM DEPOSIT 300\nपेमेंट ऐड करने के बाद ऐप को रिफ्रेश करें।\nअगर आपका पेमेंट आपके वॉलेट में नहीं आता है तो पेमेंट का स्क्रीनशॉट व्हाट्सएप पर एडमिन को भेजें।"
+                    android:textColor="@color/white"
+                    android:textSize="13sp"
+                    android:gravity="center"/>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ENTER POINTS -->
+            <LinearLayout
+                android:id="@+id/enterBox"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal"
+                android:background="@drawable/bg_input_round"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                app:layout_constraintTop_toBottomOf="@id/cardNotice"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_keypad"
+                    android:tint="@color/colorPrimary"/>
+
+                <EditText
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:hint="Enter Points"
+                    android:inputType="number"
+                    android:background="@null"/>
+            </LinearLayout>
+
+            <!-- SELECT POINTS -->
+            <TextView
+                android:id="@+id/txtSelect"
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:layout_marginTop="20dp"
+                android:text="Select Points Amount"
+                android:textStyle="bold"
+                android:textColor="@color/textPrimary"
+                app:layout_constraintTop_toBottomOf="@id/enterBox"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <!-- QUICK BUTTONS -->
+            <GridLayout
+                android:id="@+id/grid"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:columnCount="3"
+                android:layout_marginTop="12dp"
+                app:layout_constraintTop_toBottomOf="@id/txtSelect"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <Button style="@style/PointButton" android:text="500"/>
+                <Button style="@style/PointButton" android:text="1000"/>
+                <Button style="@style/PointButton" android:text="2000"/>
+                <Button style="@style/PointButton" android:text="5000"/>
+                <Button style="@style/PointButton" android:text="10000"/>
+            </GridLayout>
+
+            <!-- ADD POINTS BUTTON -->
+            <Button
+                android:id="@+id/btnAddPoints"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_marginTop="24dp"
+                android:text="Add Points"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:background="@drawable/bg_button_primary"
+                app:layout_constraintTop_toBottomOf="@id/grid"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
