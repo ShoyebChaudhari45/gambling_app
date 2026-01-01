@@ -29,6 +29,8 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameVH> {
 
     // tesing it again
 
+    // test
+
     @NonNull
     @Override
     public GameVH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
