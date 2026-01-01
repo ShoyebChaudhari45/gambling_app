@@ -13,6 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GameApp">
         <activity
+            android:name=".activities.SingleDigitActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.SupportActivity"
             android:exported="false" />
         <activity

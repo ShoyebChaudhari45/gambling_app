@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,42 +23,46 @@ public class AddPointsActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Back arrow click
-        toolbar.setNavigationOnClickListener(v -> {
-            Toast.makeText(this, "Back clicked", Toast.LENGTH_SHORT).show();
-            finish();
-        });
+        toolbar.setNavigationOnClickListener(v -> finish());
 
         // ================= VIEWS =================
         EditText edtPoints = findViewById(R.id.enterBox)
                 .findViewById(android.R.id.edit);
 
         Button btnAddPoints = findViewById(R.id.btnAddPoints);
+        GridLayout grid = findViewById(R.id.grid);
 
-        // Quick amount buttons
-        Button btn500 = findViewById(R.id.grid).findViewWithTag("500");
-        Button btn1000 = findViewById(R.id.grid).findViewWithTag("1000");
-        Button btn2000 = findViewById(R.id.grid).findViewWithTag("2000");
-        Button btn5000 = findViewById(R.id.grid).findViewWithTag("5000");
-        Button btn10000 = findViewById(R.id.grid).findViewWithTag("10000");
+        // ================= QUICK AMOUNT BUTTONS =================
+        for (int i = 0; i < grid.getChildCount(); i++) {
+            View view = grid.getChildAt(i);
 
-        View.OnClickListener quickClick = v -> {
-            Button b = (Button) v;
-            String amount = b.getText().toString();
-            Toast.makeText(this, "Selected: " + amount, Toast.LENGTH_SHORT).show();
-        };
+            if (view instanceof Button) {
+                Button button = (Button) view;
 
-        btn500.setOnClickListener(quickClick);
-        btn1000.setOnClickListener(quickClick);
-        btn2000.setOnClickListener(quickClick);
-        btn5000.setOnClickListener(quickClick);
-        btn10000.setOnClickListener(quickClick);
+                button.setOnClickListener(v -> {
+                    String amount = button.getText().toString();
+                    edtPoints.setText(amount);
+                    Toast.makeText(
+                            this,
+                            "Selected: " + amount,
+                            Toast.LENGTH_SHORT
+                    ).show();
+                });
+            }
+        }
 
-        // ================= ADD POINTS =================
+        // ================= ADD POINTS BUTTON =================
         btnAddPoints.setOnClickListener(v -> {
+            String amount = edtPoints.getText().toString().trim();
+
+            if (amount.isEmpty()) {
+                Toast.makeText(this, "Please enter points", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             Toast.makeText(
                     this,
-                    "Add Points clicked",
+                    "Add Points clicked: " + amount,
                     Toast.LENGTH_SHORT
             ).show();
         });

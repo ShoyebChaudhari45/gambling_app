@@ -23,14 +23,14 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="20dp"
-            android:text="Shoyeb Chaudhari"
+            android:text="Player Name "
             android:textColor="@color/white"
             android:textStyle="bold"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="18dp"
-            android:text="9175306510"
+            android:text="3214569871"
             android:textColor="@color/white"
             android:textSize="12sp"/>
     </LinearLayout>

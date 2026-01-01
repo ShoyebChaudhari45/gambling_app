@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg_main">
+
+    <!-- ================= TOOLBAR ================= -->
+    <androidx.appcompat.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/colorPrimary"
+        android:navigationIcon="@drawable/ic_back"
+        android:title="Single Digit"
+        android:titleTextColor="@color/white"
+        android:paddingEnd="16dp" />
+
+    <!-- ================= BALANCE ================= -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="16dp">
+
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_diamond" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="425"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="@color/dark_text" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Balance"
+            android:textColor="@color/textSecondary" />
+    </LinearLayout>
+
+    <!-- ================= DATE + SESSION ================= -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="12dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="2dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="12dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Tue 23-Dec-2025"
+                android:textStyle="bold"
+                android:textColor="@color/dark_text" />
+
+            <Button
+                android:layout_width="72dp"
+                android:layout_height="36dp"
+                android:text="Open"
+                android:textSize="13sp"
+                android:background="@drawable/bg_pill_blue"
+                android:textColor="@color/white" />
+
+            <Space
+                android:layout_width="8dp"
+                android:layout_height="1dp" />
+
+            <Button
+                android:layout_width="72dp"
+                android:layout_height="36dp"
+                android:text="Close"
+                android:textSize="13sp"
+                android:background="@drawable/bg_pill_blue"
+                android:textColor="@color/white" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- ================= INPUTS ================= -->
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:hint="Enter Digits"
+        android:background="@drawable/bg_input"
+        android:paddingHorizontal="12dp" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_margin="16dp"
+        android:hint="Enter Points"
+        android:background="@drawable/bg_input"
+        android:paddingHorizontal="12dp" />
+
+    <!-- ================= PROCEED ================= -->
+    <Button
+        android:layout_width="120dp"
+        android:layout_height="44dp"
+        android:layout_gravity="end"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/bg_dark_pill"
+        android:text="Proceed"
+        android:textColor="@color/white" />
+
+    <!-- ================= BID LIST ================= -->
+    <include layout="@layout/item_bid_row" />
+    <include layout="@layout/item_bid_row" />
+
+    <!-- ================= BOTTOM BAR ================= -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_margin="16dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Total Points : 20"
+            android:textStyle="bold"
+            android:textColor="@color/dark_text" />
+
+        <Button
+            android:layout_width="120dp"
+            android:layout_height="44dp"
+            android:text="SUBMIT"
+            android:background="@drawable/bg_dark_pill"
+            android:textColor="@color/white" />
+    </LinearLayout>
+
+</LinearLayout>

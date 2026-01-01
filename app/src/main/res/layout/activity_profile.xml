@@ -23,7 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginTop="20dp"
-            android:text="Shoyeb Chaudhari"/>
+            android:text="UserName"/>
 
         <!-- EMAIL -->
         <EditText
@@ -37,7 +37,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginTop="12dp"
-            android:text="9175306510"
+            android:text="mobile number"
             android:enabled="false"/>
 
         <!-- EDIT -->

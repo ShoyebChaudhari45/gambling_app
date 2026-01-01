@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,71 +22,56 @@ public class SupportActivity extends AppCompatActivity {
         setupSupportRows();
     }
 
-    // ================= SET DATA =================
     private void setupSupportRows() {
 
-        ViewGroup root = findViewById(R.id.main);
-
-        for (int i = 0; i < root.getChildCount(); i++) {
-            View view = root.getChildAt(i);
-            if (view.getTag() != null) {
-                bindRow(view);
-            }
-        }
+        bindRow(findViewById(R.id.rowCall), "call");
+        bindRow(findViewById(R.id.rowWhatsapp), "whatsapp");
+        bindRow(findViewById(R.id.rowEmail), "email");
+        bindRow(findViewById(R.id.rowTelegram), "telegram");
+        bindRow(findViewById(R.id.rowProof), "proof");
     }
 
-    private void bindRow(View view) {
+    private void bindRow(View view, String tag) {
 
         TextView title = view.findViewById(R.id.txtTitle);
         TextView value = view.findViewById(R.id.txtValue);
         ImageView icon = view.findViewById(R.id.imgIcon);
 
-        String tag = view.getTag().toString();
+        switch (tag) {
 
-        // ================= CALL =================
-        if (tag.equals("call")) {
+            case "call":
+                title.setText("Call");
+                value.setText("+91 9000000000");
+                icon.setImageResource(R.drawable.ic_call);
+                view.setOnClickListener(v ->
+                        Toast.makeText(this, "Call clicked", Toast.LENGTH_SHORT).show());
+                break;
 
-            title.setText("Call");
-            value.setText("+91 8905513093");
-            icon.setImageResource(R.drawable.ic_call);
+            case "whatsapp":
+                title.setText("WhatsApp");
+                value.setText("+91 9000000000");
+                icon.setImageResource(R.drawable.ic_whatsapp);
+                view.setOnClickListener(v ->
+                        startActivity(new Intent(Intent.ACTION_VIEW,
+                                Uri.parse("https://wa.me/919000000000"))));
+                break;
 
-            view.setOnClickListener(v -> {
-                Toast.makeText(this, "Calling...", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(Intent.ACTION_CALL);
-                intent.setData(Uri.parse("tel:+918905513093"));
-                startActivity(intent);
-            });
+            case "email":
+                title.setText("Email");
+                value.setText("support@example.com");
+                icon.setImageResource(R.drawable.ic_email);
+                break;
 
-        }
-        // ================= WHATSAPP =================
-        else if (tag.equals("whatsapp")) {
+            case "telegram":
+                title.setText("Telegram");
+                value.setText("https://t.me/example");
+                icon.setImageResource(R.drawable.ic_telegram);
+                break;
 
-            title.setText("WhatsApp");
-            value.setText("+91 8442017014");
-            icon.setImageResource(R.drawable.ic_whatsapp);
-
-            view.setOnClickListener(v -> {
-                Toast.makeText(this, "Opening WhatsApp", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse("https://wa.me/918442017014"));
-                startActivity(intent);
-            });
-
-        }
-        // ================= TELEGRAM =================
-        else if (tag.equals("telegram")) {
-
-            title.setText("Telegram");
-            value.setText("https://t.me/kalyan777");
-            icon.setImageResource(R.drawable.ic_telegram);
-
-            view.setOnClickListener(v -> {
-                Toast.makeText(this, "Opening Telegram", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse("https://t.me/kalyan777"));
-                startActivity(intent);
-            });
-
+            case "proof":
+                title.setText("Withdraw Proof");
+                value.setText("View Proof");
+                break;
         }
     }
 }
