@@ -17,6 +17,11 @@
     <color name="textSecondary">#6B6B6B</color>
     <color name="dark_text">#1E293B</color>
     <color name="accent_dark">#1E3A8A</color>
+    <!-- Dark Theme Text Colors -->
+    <!-- White text on dark background -->
+    <color name="medium_text">#B0B0B0</color>    <!-- Light grey for secondary -->
+    <color name="light_text">#808080</color>     <!-- Medium grey for hints -->
+    <color name="text_disabled">#666666</color>  <!-- Darker grey for disabled -->
 
     <!-- COMMON -->
     <color name="white">#FFFFFF</color>
@@ -24,6 +29,16 @@
     <color name="whatsapp_green">#25D366</color>
     <color name="sky_blue">#73C6FF</color>
     <color name="dark_blue">#14284A</color>
+
+    <!-- colors.xml -->
+    <color name="primary">#3F51B5</color>      <!-- Indigo for primary actions -->
+    <color name="primary_dark">#303F9F</color> <!-- Darker indigo for toolbar -->
+    <color name="accent">#FF4081</color>       <!-- Pink accent for highlights -->
+    <color name="background">#F5F5F5</color>   <!-- Light grey background -->
+    <color name="card_bg">#FFFFFF</color>      <!-- White for cards -->
+    <color name="text_primary">#212121</color> <!-- Dark grey for primary text -->
+    <color name="text_secondary">#757575</color>
+    <color name="card_stroke">#424242</color><!-- Medium grey for secondary -->
 
 
 </resources>
