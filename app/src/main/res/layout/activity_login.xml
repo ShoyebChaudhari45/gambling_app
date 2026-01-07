@@ -189,7 +189,7 @@
                 android:letterSpacing="0.03"
                 android:textColor="@android:color/white"
                 app:cornerRadius="12dp"
-                app:backgroundTint="@color/colorAccent"
+                app:backgroundTint="@color/dark_blue"
                 app:elevation="4dp"
                 app:iconGravity="textEnd"
                 app:rippleColor="@android:color/white"

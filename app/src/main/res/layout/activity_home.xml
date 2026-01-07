@@ -51,7 +51,7 @@
                     android:src="@drawable/ic_menu"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:padding="8dp"
-                    app:tint="@android:color/white" />
+                    app:tint="@color/dark_blue" />
 
             </com.google.android.material.card.MaterialCardView>
 
@@ -60,7 +60,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Kalyan Matka"
-                android:textColor="@android:color/white"
+                android:textColor="@color/dark_blue"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:fontFamily="sans-serif-medium"

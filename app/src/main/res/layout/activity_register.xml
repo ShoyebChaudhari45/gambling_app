@@ -273,7 +273,7 @@
                 android:textStyle="bold"
                 android:letterSpacing="0.03"
                 app:cornerRadius="12dp"
-                app:backgroundTint="@color/colorAccent"
+                app:backgroundTint="@color/dark_blue"
                 app:elevation="4dp"
                 app:rippleColor="@android:color/white"
                 android:stateListAnimator="@null"/>

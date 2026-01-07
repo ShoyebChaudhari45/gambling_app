@@ -335,7 +335,7 @@
                 app:iconPadding="8dp"
                 app:iconTint="@android:color/white"
                 app:cornerRadius="12dp"
-                app:backgroundTint="@color/colorPrimary"
+                app:backgroundTint="@color/dark_blue"
                 app:elevation="4dp"
                 app:rippleColor="@android:color/white"
                 android:stateListAnimator="@null"/>
@@ -356,7 +356,7 @@
                 app:iconPadding="8dp"
                 app:iconTint="@color/colorPrimary"
                 app:cornerRadius="12dp"
-                app:backgroundTint="@android:color/transparent"
+                app:backgroundTint="@color/dark_blue"
                 app:strokeColor="@color/colorPrimary"
                 app:strokeWidth="2dp"
                 app:rippleColor="@color/colorPrimaryLight"
