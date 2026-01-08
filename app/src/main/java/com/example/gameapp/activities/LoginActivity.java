@@ -1,4 +1,5 @@
 package com.example.gameapp.activities;
+import android.widget.TextView;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -48,6 +49,13 @@ public class LoginActivity extends AppCompatActivity {
         MaterialButton btnLogin = findViewById(R.id.btnLogin);
         TextView txtSignup = findViewById(R.id.txtSignup);
         progressContainer = findViewById(R.id.progressContainer);
+
+        TextView txtForgot = findViewById(R.id.txtForgot);
+
+        txtForgot.setOnClickListener(v -> {
+            startActivity(new Intent(LoginActivity.this, ForgotPasswordActivity.class));
+        });
+
 
         btnLogin.setOnClickListener(v -> loginUser());
 

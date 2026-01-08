@@ -215,6 +215,7 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
+
     <!-- LOADING OVERLAY -->
     <FrameLayout
         android:id="@+id/progressContainer"
@@ -240,6 +241,5 @@
         </com.google.android.material.card.MaterialCardView>
 
     </FrameLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
