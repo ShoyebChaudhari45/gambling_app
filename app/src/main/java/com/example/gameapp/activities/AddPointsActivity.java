@@ -31,7 +31,12 @@ public class AddPointsActivity extends AppCompatActivity {
         ImageButton btnBack = findViewById(R.id.btnBack);
 
         // ================= BACK BUTTON =================
-        btnBack.setOnClickListener(v -> handleBackPress());
+        btnBack.setOnClickListener(v -> {
+            Intent intent = new Intent(AddPointsActivity.this, HomeActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
+            finish();
+        });
 
         // ================= QUICK AMOUNT BUTTONS =================
         for (int i = 0; i < grid.getChildCount(); i++) {

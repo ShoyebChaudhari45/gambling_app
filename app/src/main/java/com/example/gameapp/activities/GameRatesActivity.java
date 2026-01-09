@@ -2,6 +2,7 @@ package com.example.gameapp.activities;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,7 +33,7 @@ public class GameRatesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_rates);
-
+        ImageButton btnBack = findViewById(R.id.btnBack);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(v -> finish());

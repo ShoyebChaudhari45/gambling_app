@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="6dp"
+    app:cardBackgroundColor="@color/white">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="14dp">
+
+        <!-- CLOCK ICON -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/iconCard"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@color/light_blue"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_clock"
+                app:tint="@color/dark_blue" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- TAP TIME -->
+        <TextView
+            android:id="@+id/txtTap"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="10:00 AM - 11:00 AM"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/textPrimary"
+            app:layout_constraintStart_toEndOf="@id/iconCard"
+            app:layout_constraintTop_toTopOf="@id/iconCard"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <!-- STATUS -->
+        <TextView
+            android:id="@+id/txtStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="OPEN"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="@color/green"
+            app:layout_constraintStart_toStartOf="@id/txtTap"
+            app:layout_constraintTop_toBottomOf="@id/txtTap"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

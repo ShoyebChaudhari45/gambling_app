@@ -1,60 +1,79 @@
 package com.example.gameapp.Adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.gameapp.R;
-import com.example.gameapp.activities.GamePlayActivity;
 import com.example.gameapp.models.GameModel;
-import com.google.android.material.button.MaterialButton;
 
 import java.util.List;
-public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder> {
 
-    private final Context context;
-    private final List<GameModel> list;
 
-    public GameAdapter(Context context, List<GameModel> list) {
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+import com.example.gameapp.R;
+import com.example.gameapp.models.GameModel;
+
+import java.util.List;
+
+public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameVH> {
+
+    public interface OnGameClickListener {
+        void onGameClick(GameModel game);
+    }
+
+    private Context context;
+    private List<GameModel> list;
+    private OnGameClickListener listener;
+
+    public GameAdapter(Context context, List<GameModel> list, OnGameClickListener listener) {
         this.context = context;
         this.list = list;
+        this.listener = listener;
     }
 
     @NonNull
     @Override
-    public GameViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context)
+    public GameVH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(context)
                 .inflate(R.layout.item_game, parent, false);
-        return new GameViewHolder(view);
+        return new GameVH(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull GameViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull GameVH h, int pos) {
+        GameModel game = list.get(pos);
 
-        GameModel model = list.get(position);
+        h.txtName.setText(game.getName());
 
-        // ✅ NULL SAFE
-        if (holder.txtGameName != null)
-            holder.txtGameName.setText(model.getName());
+        Glide.with(context)
+                .load(game.getImage())
+                .placeholder(R.drawable.ic_placeholder)
+                .error(R.drawable.ic_placeholder)
+                .into(h.img);
 
-        if (holder.txtGameTime != null)
-            holder.txtGameTime.setText(model.getTime());
-
-        if (holder.txtGameResult != null)
-            holder.txtGameResult.setText(
-                    model.getResult() != null ? model.getResult() : "-"
-            );
-
-        holder.btnPlay.setOnClickListener(v -> {
-            Intent intent = new Intent(context, GamePlayActivity.class);
-            intent.putExtra("GAME_NAME", model.getName());
-            context.startActivity(intent);
+        h.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onGameClick(game);
+            }
         });
     }
 
@@ -63,19 +82,15 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
         return list.size();
     }
 
-    static class GameViewHolder extends RecyclerView.ViewHolder {
+    static class GameVH extends RecyclerView.ViewHolder {
+        TextView txtName;
+        ImageView img;
 
-        TextView txtGameName, txtGameTime, txtGameResult;
-        MaterialButton btnPlay;
-
-        public GameViewHolder(@NonNull View itemView) {
-            super(itemView);
-
-            // ✅ MUST MATCH XML IDS
-            txtGameName = itemView.findViewById(R.id.txtGameName);
-            txtGameTime = itemView.findViewById(R.id.txtGameTime);
-            txtGameResult = itemView.findViewById(R.id.txtGameResult);
-            btnPlay = itemView.findViewById(R.id.btnPlay);
+        public GameVH(@NonNull View v) {
+            super(v);
+            txtName = v.findViewById(R.id.txtGameName);
+            img = v.findViewById(R.id.imgGame);
         }
     }
 }
+

@@ -45,4 +45,30 @@
     <!-- Medium grey for secondary -->
 
 
+
+    <!-- ================= PRIMARY BRAND COLORS ================= -->
+
+    <color name="light_blue">#E0ECFF</color>
+
+    <!-- ================= TEXT COLORS ================= -->
+      <!-- Soft Gray -->
+
+    <!-- ================= STATUS COLORS ================= -->
+    <color name="green">#16A34A</color>           <!-- Open / Success -->
+    <color name="red">#DC2626</color>             <!-- Error / Closed -->
+    <color name="orange">#F59E0B</color>          <!-- Pending -->
+
+    <!-- ================= DIVIDERS & BORDERS ================= -->
+
+    <color name="border">#D1D5DB</color>
+
+    <!-- ================= ICON TINTS ================= -->
+    <color name="iconPrimary">#1E3A8A</color>
+    <color name="iconSecondary">#6B7280</color>
+
+    <!-- ================= TRANSPARENT OVERLAY ================= -->
+    <color name="overlay_dark">#80000000</color>
+
+
+
 </resources>

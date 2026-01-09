@@ -1,44 +1,35 @@
 package com.example.gameapp.models;
 
+import com.example.gameapp.models.response.TapsResponse;
+import java.util.List;
+
+
+
+
 public class GameModel {
 
     private String name;
-    private String result;
-    private String time;
+    private String image;
+    private List<TapsResponse.Tap> taps;
 
-    // Required empty constructor (important for Firebase / Gson)
-    public GameModel() {
-    }
-
-    public GameModel(String name, String result, String time) {
+    public GameModel(String name, String image) {
         this.name = name;
-        this.result = result;
-        this.time = time;
+        this.image = image;
     }
 
-    // Getters
     public String getName() {
         return name;
     }
 
-    public String getResult() {
-        return result;
+    public String getImage() {
+        return image;
     }
 
-    public String getTime() {
-        return time;
+    public List<TapsResponse.Tap> getTaps() {
+        return taps;
     }
 
-    // Setters
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setResult(String result) {
-        this.result = result;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
+    public void setTaps(List<TapsResponse.Tap> taps) {
+        this.taps = taps;
     }
 }

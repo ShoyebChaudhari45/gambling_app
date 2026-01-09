@@ -5,149 +5,92 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
-    android:layout_marginBottom="12dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="3dp"
-    app:cardBackgroundColor="@android:color/white"
-    app:strokeWidth="0dp">
+    android:layout_marginVertical="10dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="#FFFFFF"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <!-- GAME ICON -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/iconCard"
+        <!-- FULL CIRCULAR GAME IMAGE -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/imgGame"
             android:layout_width="56dp"
             android:layout_height="56dp"
-            app:cardCornerRadius="28dp"
-            app:cardElevation="0dp"
-            app:cardBackgroundColor="#FFF3E0"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            android:src="@drawable/ic_placeholder"
+            android:scaleType="centerCrop"
+            app:shapeAppearanceOverlay="@style/CircleImage"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_game"
-                app:tint="#FF9800"/>
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- GAME INFO -->
-        <LinearLayout
-            android:id="@+id/layoutGameInfo"
+        <!-- GAME NAME -->
+        <TextView
+            android:id="@+id/txtGameName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:orientation="vertical"
-            app:layout_constraintTop_toTopOf="@id/iconCard"
-            app:layout_constraintBottom_toBottomOf="@id/iconCard"
-            app:layout_constraintStart_toEndOf="@id/iconCard"
-            app:layout_constraintEnd_toStartOf="@id/btnPlay">
-
-            <TextView
-                android:id="@+id/txtGameName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="KARNATAKA DAY"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:textColor="@color/textPrimary"
-                android:fontFamily="sans-serif-medium"/>
-
-            <TextView
-                android:id="@+id/txtGameTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="10:00 AM - 11:00 AM"
-                android:textColor="@color/textSecondary"
-                android:textSize="12sp"
-                android:drawableStart="@drawable/ic_time"
-                android:drawablePadding="4dp"
-                android:drawableTint="@color/textSecondary"/>
-
-        </LinearLayout>
+            android:layout_marginStart="14dp"
+            android:text="JODI"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/textPrimary"
+            app:layout_constraintStart_toEndOf="@id/imgGame"
+            app:layout_constraintTop_toTopOf="@id/imgGame"
+            app:layout_constraintEnd_toStartOf="@id/btnPlay"/>
 
         <!-- PLAY BUTTON -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnPlay"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
+            android:layout_width="92dp"
+            android:layout_height="42dp"
             android:text="PLAY"
-            android:textSize="13sp"
+            android:textAllCaps="true"
             android:textStyle="bold"
-            android:paddingHorizontal="20dp"
-            app:cornerRadius="20dp"
-            app:backgroundTint="@color/colorAccent"
-            app:iconSize="16dp"
-            app:iconTint="@android:color/white"
-            android:textColor="@android:color/white"
-            app:layout_constraintTop_toTopOf="@id/iconCard"
-            app:layout_constraintBottom_toBottomOf="@id/iconCard"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            android:textColor="#FFFFFF"
+            app:cornerRadius="21dp"
+            app:backgroundTint="#FFD966"
+            app:elevation="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/imgGame"/>
 
         <!-- DIVIDER -->
         <View
-            android:id="@+id/divider"
             android:layout_width="0dp"
             android:layout_height="1dp"
-            android:layout_marginTop="12dp"
-            android:background="#E0E0E0"
-            app:layout_constraintTop_toBottomOf="@id/iconCard"
+            android:layout_marginTop="16dp"
+            android:background="#E5E7EB"
+            app:layout_constraintTop_toBottomOf="@id/imgGame"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
-        <!-- RESULT SECTION -->
-        <LinearLayout
-            android:layout_width="0dp"
+        <!-- RESULT -->
+        <TextView
+            android:id="@+id/txtGameSub"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            app:layout_constraintTop_toBottomOf="@id/divider"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            android:text="Result :  -"
+            android:textSize="14sp"
+            android:textColor="@color/textSecondary"
+            app:layout_constraintTop_toBottomOf="@id/imgGame"
+            app:layout_constraintStart_toStartOf="parent"/>
 
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                app:tint="@color/colorPrimary"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="Result:"
-                android:textColor="@color/textSecondary"
-                android:textSize="12sp"/>
-
-            <TextView
-                android:id="@+id/txtGameResult"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:text="169 - 64 - 789"
-                android:textColor="@color/colorAccent"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:fontFamily="sans-serif-medium"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="VIEW DETAILS"
-                android:textColor="@color/colorPrimary"
-                android:textSize="11sp"
-                android:textStyle="bold"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="4dp"/>
-
-        </LinearLayout>
+        <!-- VIEW DETAILS -->
+        <TextView
+            android:id="@+id/txtViewDetails"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="VIEW DETAILS"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#7EC8FF"
+            app:layout_constraintTop_toBottomOf="@id/imgGame"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

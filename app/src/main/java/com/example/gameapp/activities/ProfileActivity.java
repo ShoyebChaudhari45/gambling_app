@@ -1,4 +1,3 @@
-// ProfileActivity.java
 package com.example.gameapp.activities;
 
 import android.content.Intent;
@@ -15,6 +14,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.gameapp.R;
 import com.example.gameapp.api.ApiClient;
 import com.example.gameapp.api.ApiService;
+import com.example.gameapp.models.request.UpdateProfileRequest;
+import com.example.gameapp.models.response.GenericResponse;
 import com.example.gameapp.models.response.UserDetailsResponse;
 import com.example.gameapp.session.SessionManager;
 import com.google.android.material.button.MaterialButton;
@@ -27,26 +28,36 @@ import retrofit2.Response;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    private static final String TAG = "USER_DETAILS";
+    private static final String TAG = "PROFILE_ACTIVITY";
 
-    TextInputEditText etName, etEmail, etMobile;
-    TextView tvUserType, tvMemberSince;
-    View progressContainer, viewHeader;
-    ImageButton btnBack;
-    MaterialCardView profileCard;
-
-    MaterialButton btnEdit, btnSubmit, btnLogout;
+    // Views
+    private TextInputEditText etName, etEmail, etMobile;
+    private TextView tvUserType, tvMemberSince;
+    private View progressContainer, viewHeader;
+    private ImageButton btnBack;
+    private MaterialCardView profileCard;
+    private MaterialButton btnEdit, btnSubmit, btnLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+        initViews();
+        setListeners();
+        fetchUserDetails();
+    }
+
+    // ================= INITIALIZATION =================
+
+    private void initViews() {
         etName = findViewById(R.id.etName);
         etEmail = findViewById(R.id.etEmail);
         etMobile = findViewById(R.id.etMobile);
+
         tvUserType = findViewById(R.id.tvUserType);
         tvMemberSince = findViewById(R.id.tvMemberSince);
+
         progressContainer = findViewById(R.id.progressContainer);
         viewHeader = findViewById(R.id.viewHeader);
         btnBack = findViewById(R.id.btnBack);
@@ -56,29 +67,23 @@ public class ProfileActivity extends AppCompatActivity {
         btnSubmit = findViewById(R.id.btnSubmit);
         btnLogout = findViewById(R.id.btnLogout);
 
-        // Back button functionality
-        btnBack.setOnClickListener(v -> {
-            Intent intent = new Intent(ProfileActivity.this, HomeActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            startActivity(intent);
-            finish();
-        });
+        // Initially disabled
+        etName.setEnabled(false);
+        etEmail.setEnabled(false);
+        btnSubmit.setVisibility(View.GONE);
+    }
 
-        // Header click to go to homepage
+    private void setListeners() {
+
+        btnBack.setOnClickListener(v -> goToHomePage());
         viewHeader.setOnClickListener(v -> goToHomePage());
-
-        // Profile card click to go to homepage (optional)
         profileCard.setOnClickListener(v -> goToHomePage());
 
-        btnEdit.setOnClickListener(v -> {
-            etName.setEnabled(true);
-            etEmail.setEnabled(true);
-            btnSubmit.setVisibility(View.VISIBLE);
-        });
+        btnEdit.setOnClickListener(v -> enableEditMode());
+
+        btnSubmit.setOnClickListener(v -> submitProfileUpdate());
 
         btnLogout.setOnClickListener(v -> logout());
-
-        fetchUserDetails();
     }
 
     // ================= NAVIGATION =================
@@ -90,20 +95,15 @@ public class ProfileActivity extends AppCompatActivity {
         finish();
     }
 
-    @Override
-    public void onBackPressed() {
-        // Go back to previous activity or homepage
-        super.onBackPressed();
-    }
+    // ================= FETCH PROFILE =================
 
-    // ================= API CALL =================
     private void fetchUserDetails() {
 
         showLoader(true);
 
         String token = "Bearer " + SessionManager.getToken(this);
-
         ApiService api = ApiClient.getClient().create(ApiService.class);
+
         api.getUserDetails(token, "application/json")
                 .enqueue(new Callback<UserDetailsResponse>() {
 
@@ -112,14 +112,14 @@ public class ProfileActivity extends AppCompatActivity {
                                            Response<UserDetailsResponse> response) {
 
                         showLoader(false);
-                        Log.d(TAG, "HTTP Code: " + response.code());
+                        Log.d(TAG, "Fetch Profile HTTP: " + response.code());
 
                         if (response.isSuccessful() && response.body() != null) {
 
                             UserDetailsResponse.User user = response.body().data;
 
                             if (user == null) {
-                                toast("User data missing");
+                                toast("User data not found");
                                 return;
                             }
 
@@ -128,7 +128,6 @@ public class ProfileActivity extends AppCompatActivity {
                             etMobile.setText(nullSafe(user.mobileNo));
                             tvUserType.setText(capitalize(user.userType));
                             tvMemberSince.setText(formatDate(user.createdAt));
-
                             return;
                         }
 
@@ -138,24 +137,84 @@ public class ProfileActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(Call<UserDetailsResponse> call, Throwable t) {
                         showLoader(false);
-                        Log.e(TAG, "API Error", t);
+                        Log.e(TAG, "Fetch Profile Error", t);
                         toast("Network error");
                     }
                 });
     }
 
-    // ================= SAFE HELPERS =================
+    // ================= EDIT PROFILE =================
+
+    private void enableEditMode() {
+        etName.setEnabled(true);
+        etEmail.setEnabled(true);
+        btnSubmit.setVisibility(View.VISIBLE);
+    }
+
+    private void submitProfileUpdate() {
+
+        String name = etName.getText().toString().trim();
+        String email = etEmail.getText().toString().trim();
+
+        if (name.isEmpty()) {
+            etName.setError("Name required");
+            return;
+        }
+
+        if (email.isEmpty()) {
+            etEmail.setError("Email required");
+            return;
+        }
+
+        showLoader(true);
+
+        String token = "Bearer " + SessionManager.getToken(this);
+        UpdateProfileRequest request = new UpdateProfileRequest(name, email);
+
+        ApiService api = ApiClient.getClient().create(ApiService.class);
+        api.updateProfile(token, "application/json", request)
+                .enqueue(new Callback<GenericResponse>() {
+
+                    @Override
+                    public void onResponse(Call<GenericResponse> call,
+                                           Response<GenericResponse> response) {
+
+                        showLoader(false);
+
+                        if (response.isSuccessful()
+                                && response.body() != null
+                                && response.body().status) {
+
+                            toast("Profile updated successfully");
+
+                            // Disable edit mode
+                            etName.setEnabled(false);
+                            etEmail.setEnabled(false);
+                            btnSubmit.setVisibility(View.GONE);
+                            return;
+                        }
+
+                        toast(response.body() != null
+                                ? response.body().message
+                                : "Update failed");
+                    }
+
+                    @Override
+                    public void onFailure(Call<GenericResponse> call, Throwable t) {
+                        showLoader(false);
+                        toast("Network error");
+                    }
+                });
+    }
+
+    // ================= HELPERS =================
 
     private String nullSafe(String value) {
         return value == null ? "" : value;
     }
 
     private String formatDate(String iso) {
-
-        if (iso == null || iso.length() < 7) {
-            return "N/A";
-        }
-
+        if (iso == null || iso.length() < 7) return "N/A";
         try {
             return iso.substring(0, 7).replace("-", " ");
         } catch (Exception e) {
@@ -177,6 +236,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     // ================= LOGOUT =================
+
     private void logout() {
         new AlertDialog.Builder(this)
                 .setTitle("Logout")
