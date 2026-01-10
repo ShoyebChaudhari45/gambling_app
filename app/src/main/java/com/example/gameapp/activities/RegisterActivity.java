@@ -18,7 +18,7 @@ import com.example.gameapp.models.request.RegisterRequest;
 import com.example.gameapp.models.response.RegisterResponse;
 import com.google.android.material.button.MaterialButton;
 
-import java.io.IOException;
+import java.util.regex.Pattern;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -28,11 +28,15 @@ public class RegisterActivity extends AppCompatActivity {
 
     private static final String TAG = "REGISTER_API";
 
-    EditText edtName, edtMobile, edtEmail, edtPassword;
-    RadioGroup rgUserType;
-    MaterialButton btnSignup;
-    TextView txtLogin;
-    View progressContainer;
+    private EditText edtName, edtMobile, edtEmail, edtPassword;
+    private RadioGroup rgUserType;
+    private MaterialButton btnSignup;
+    private TextView txtLogin;
+    private View progressContainer;
+
+    // 🔐 Password: 1 upper, 1 lower, 1 number, 1 special, min 8
+    private static final Pattern PASSWORD_PATTERN =
+            Pattern.compile("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&+=!]).{6,}$");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +55,11 @@ public class RegisterActivity extends AppCompatActivity {
         btnSignup.setOnClickListener(v -> registerUser());
 
         txtLogin.setOnClickListener(v ->
-                startActivity(new Intent(this, LoginActivity.class))
+                startActivity(new Intent(RegisterActivity.this, LoginActivity.class))
         );
     }
 
+    // ================= REGISTER =================
     private void registerUser() {
 
         String name = edtName.getText().toString().trim();
@@ -62,24 +67,38 @@ public class RegisterActivity extends AppCompatActivity {
         String email = edtEmail.getText().toString().trim();
         String password = edtPassword.getText().toString().trim();
 
-        // 🔹 CLIENT-SIDE VALIDATION
+        // 👤 Name
         if (name.isEmpty()) {
-            toast("Enter your name");
+            toast("Please enter your name");
             return;
         }
 
-        if (mobile.length() != 10) {
-            toast("Mobile number must be 10 digits");
+        // 📱 Mobile
+        if (!mobile.matches("^[6-9]\\d{9}$")) {
+            toast("Enter a valid 10-digit mobile number");
             return;
         }
 
+        // 📧 Email
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             toast("Enter a valid email address");
             return;
         }
 
-        if (password.length() < 6) {
-            toast("Password must be at least 6 characters");
+        // 🔐 Password
+        if (!PASSWORD_PATTERN.matcher(password).matches()) {
+            toast("Password must contain:\n" +
+                    "• 1 uppercase letter\n" +
+                    "• 1 lowercase letter\n" +
+                    "• 1 number\n" +
+                    "• 1 special character\n" +
+                    "• Minimum 6 characters");
+            return;
+        }
+
+        // 👥 User type
+        if (rgUserType.getCheckedRadioButtonId() == -1) {
+            toast("Please select user type");
             return;
         }
 
@@ -95,37 +114,26 @@ public class RegisterActivity extends AppCompatActivity {
         int selectedId = rgUserType.getCheckedRadioButtonId();
         request.user_type = (selectedId == R.id.rbEmployee) ? "employee" : "customer";
 
-        Log.d(TAG, "Request -> " + email + " | " + mobile);
-
         ApiService api = ApiClient.getClient().create(ApiService.class);
         api.register(request).enqueue(new Callback<RegisterResponse>() {
 
             @Override
-            public void onResponse(Call<RegisterResponse> call, Response<RegisterResponse> response) {
+            public void onResponse(Call<RegisterResponse> call,
+                                   Response<RegisterResponse> response) {
 
                 showLoader(false);
                 Log.d(TAG, "HTTP Code: " + response.code());
 
-                // ✅ SUCCESS = HTTP 200
                 if (response.isSuccessful()) {
-
-                    String msg = "Registration successful";
-                    if (response.body() != null && response.body().message != null) {
-                        msg = response.body().message;
-                    }
-
-                    toast(msg);
+                    toast("Registration successful");
                     startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
                     finish();
                     return;
                 }
 
-                // ❌ VALIDATION ERROR
                 if (response.code() == 422 && response.errorBody() != null) {
                     try {
                         String error = response.errorBody().string();
-                        Log.e(TAG, error);
-
                         if (error.contains("email")) {
                             toast("Email already exists");
                         } else if (error.contains("mobile")) {
@@ -145,18 +153,18 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<RegisterResponse> call, Throwable t) {
                 showLoader(false);
-                Log.e(TAG, "API Failure", t);
                 toast("Network error. Please try again");
             }
         });
     }
 
+    // ================= HELPERS =================
     private void showLoader(boolean show) {
         progressContainer.setVisibility(show ? View.VISIBLE : View.GONE);
         btnSignup.setEnabled(!show);
     }
 
     private void toast(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
     }
 }

@@ -36,6 +36,10 @@ public class UserDetailsResponse {
         @SerializedName("user_type")
         public String userType;
 
+        // ✅ NEW FIELD
+        @SerializedName("balance")
+        public int balance;
+
         @SerializedName("created_at")
         public String createdAt;
 

@@ -15,7 +15,7 @@
         app:layout_constraintHeight_percent="0.32"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <!-- LOGO -->
     <com.google.android.material.card.MaterialCardView
@@ -36,7 +36,7 @@
             android:layout_height="80dp"
             android:layout_gravity="center"
             android:src="@drawable/ic_app_logo"
-            android:scaleType="fitCenter" />
+            android:scaleType="fitCenter"/>
     </com.google.android.material.card.MaterialCardView>
 
     <!-- CONTENT -->
@@ -50,14 +50,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- ONLY ONE DIRECT CHILD -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingHorizontal="24dp"
-            android:paddingTop="24dp"
-            android:paddingBottom="32dp">
+            android:paddingTop="12dp"
+            android:paddingBottom="16dp">
 
             <!-- TITLE -->
             <TextView
@@ -68,7 +67,7 @@
                 android:textSize="28sp"
                 android:textColor="@color/textPrimary"
                 android:fontFamily="sans-serif-medium"
-                android:layout_marginBottom="6dp" />
+                android:layout_marginBottom="2dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -77,13 +76,13 @@
                 android:textSize="15sp"
                 android:textColor="@color/textSecondary"
                 android:alpha="0.8"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="12dp"/>
 
             <!-- FULL NAME -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
+                android:layout_marginBottom="8dp"
                 android:hint="Full Name"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 app:boxCornerRadiusTopStart="12dp"
@@ -103,14 +102,14 @@
                     android:inputType="textPersonName"
                     android:textSize="16sp"
                     android:textColor="@color/textPrimary"
-                    android:paddingVertical="16dp" />
+                    android:paddingVertical="16dp"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- MOBILE -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
+                android:layout_marginBottom="8dp"
                 android:hint="Mobile Number"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 app:boxCornerRadiusTopStart="12dp"
@@ -131,14 +130,14 @@
                     android:layout_height="wrap_content"
                     android:inputType="phone"
                     android:maxLength="10"
-                    android:paddingVertical="14dp" />
+                    android:paddingVertical="14dp"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- EMAIL -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
+                android:layout_marginBottom="8dp"
                 android:hint="Email Address"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 app:boxCornerRadiusTopStart="12dp"
@@ -158,14 +157,14 @@
                     android:inputType="textEmailAddress"
                     android:textSize="16sp"
                     android:textColor="@color/textPrimary"
-                    android:paddingVertical="16dp" />
+                    android:paddingVertical="16dp"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- PASSWORD -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="12dp"
                 android:hint="Password"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 app:boxCornerRadiusTopStart="12dp"
@@ -187,7 +186,7 @@
                     android:inputType="textPassword"
                     android:textSize="16sp"
                     android:textColor="@color/textPrimary"
-                    android:paddingVertical="16dp" />
+                    android:paddingVertical="16dp"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- USER TYPE -->
@@ -198,12 +197,12 @@
                 android:textStyle="bold"
                 android:textSize="16sp"
                 android:textColor="@color/textPrimary"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="8dp"/>
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="14dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="1dp"
                 app:strokeWidth="2dp"
@@ -223,7 +222,7 @@
                         android:layout_weight="1"
                         android:text="Customer"
                         android:checked="true"
-                        android:buttonTint="@color/colorPrimary" />
+                        android:buttonTint="@color/colorPrimary"/>
 
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/rbEmployee"
@@ -231,11 +230,11 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Employee"
-                        android:buttonTint="@color/colorPrimary" />
+                        android:buttonTint="@color/colorPrimary"/>
                 </RadioGroup>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- SIGN UP BUTTON -->
+            <!-- BUTTON -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSignup"
                 android:layout_width="match_parent"
@@ -245,7 +244,7 @@
                 android:textColor="@android:color/white"
                 app:cornerRadius="12dp"
                 app:backgroundTint="@color/dark_blue"
-                android:stateListAnimator="@null" />
+                android:stateListAnimator="@null"/>
 
             <!-- LOGIN LINK -->
             <LinearLayout
@@ -253,13 +252,13 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="horizontal"
-                android:padding="8dp">
+                android:padding="4dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Already have an account? "
-                    android:textSize="14sp" />
+                    android:textSize="14sp"/>
 
                 <TextView
                     android:id="@+id/txtLogin"
@@ -267,9 +266,9 @@
                     android:layout_height="wrap_content"
                     android:text="Sign In"
                     android:textStyle="bold"
-                    android:padding="8dp"
+                    android:padding="4dp"
                     android:clickable="true"
-                    android:focusable="true" />
+                    android:focusable="true"/>
             </LinearLayout>
 
         </LinearLayout>
@@ -292,7 +291,7 @@
         <ProgressBar
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"/>
     </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

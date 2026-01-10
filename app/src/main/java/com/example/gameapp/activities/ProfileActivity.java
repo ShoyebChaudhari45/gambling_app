@@ -19,7 +19,6 @@ import com.example.gameapp.models.response.GenericResponse;
 import com.example.gameapp.models.response.UserDetailsResponse;
 import com.example.gameapp.session.SessionManager;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textfield.TextInputEditText;
 
 import retrofit2.Call;
@@ -32,11 +31,13 @@ public class ProfileActivity extends AppCompatActivity {
 
     // Views
     private TextInputEditText etName, etEmail, etMobile;
-    private TextView tvUserType, tvMemberSince;
-    private View progressContainer, viewHeader;
+    private TextView tvUserType;
+    private View progressContainer;
     private ImageButton btnBack;
-    private MaterialCardView profileCard;
-    private MaterialButton btnEdit, btnSubmit, btnLogout;
+    private MaterialButton btnEditSubmit, btnLogout;
+
+    // Edit mode state
+    private boolean isEditMode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,33 +57,20 @@ public class ProfileActivity extends AppCompatActivity {
         etMobile = findViewById(R.id.etMobile);
 
         tvUserType = findViewById(R.id.tvUserType);
-        tvMemberSince = findViewById(R.id.tvMemberSince);
-
         progressContainer = findViewById(R.id.progressContainer);
-        viewHeader = findViewById(R.id.viewHeader);
         btnBack = findViewById(R.id.btnBack);
-        profileCard = findViewById(R.id.profileCard);
 
-        btnEdit = findViewById(R.id.btnEdit);
-        btnSubmit = findViewById(R.id.btnSubmit);
+        btnEditSubmit = findViewById(R.id.btnEditSubmit);
         btnLogout = findViewById(R.id.btnLogout);
 
         // Initially disabled
         etName.setEnabled(false);
         etEmail.setEnabled(false);
-        btnSubmit.setVisibility(View.GONE);
     }
 
     private void setListeners() {
-
         btnBack.setOnClickListener(v -> goToHomePage());
-        viewHeader.setOnClickListener(v -> goToHomePage());
-        profileCard.setOnClickListener(v -> goToHomePage());
-
-        btnEdit.setOnClickListener(v -> enableEditMode());
-
-        btnSubmit.setOnClickListener(v -> submitProfileUpdate());
-
+        btnEditSubmit.setOnClickListener(v -> handleEditSubmit());
         btnLogout.setOnClickListener(v -> logout());
     }
 
@@ -98,7 +86,6 @@ public class ProfileActivity extends AppCompatActivity {
     // ================= FETCH PROFILE =================
 
     private void fetchUserDetails() {
-
         showLoader(true);
 
         String token = "Bearer " + SessionManager.getToken(this);
@@ -127,7 +114,6 @@ public class ProfileActivity extends AppCompatActivity {
                             etEmail.setText(nullSafe(user.email));
                             etMobile.setText(nullSafe(user.mobileNo));
                             tvUserType.setText(capitalize(user.userType));
-                            tvMemberSince.setText(formatDate(user.createdAt));
                             return;
                         }
 
@@ -143,16 +129,31 @@ public class ProfileActivity extends AppCompatActivity {
                 });
     }
 
-    // ================= EDIT PROFILE =================
+    // ================= EDIT/SUBMIT HANDLER =================
+
+    private void handleEditSubmit() {
+        if (!isEditMode) {
+            // Enable edit mode
+            enableEditMode();
+        } else {
+            // Submit the profile update
+            submitProfileUpdate();
+        }
+    }
 
     private void enableEditMode() {
+        isEditMode = true;
         etName.setEnabled(true);
         etEmail.setEnabled(true);
-        btnSubmit.setVisibility(View.VISIBLE);
+
+        // Update button UI
+        btnEditSubmit.setText("Submit Request");
+        btnEditSubmit.setIcon(getDrawable(R.drawable.ic_send));
+
+        toast("Edit your profile");
     }
 
     private void submitProfileUpdate() {
-
         String name = etName.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
 
@@ -187,10 +188,8 @@ public class ProfileActivity extends AppCompatActivity {
 
                             toast("Profile updated successfully");
 
-                            // Disable edit mode
-                            etName.setEnabled(false);
-                            etEmail.setEnabled(false);
-                            btnSubmit.setVisibility(View.GONE);
+                            // Reset to view mode
+                            disableEditMode();
                             return;
                         }
 
@@ -207,19 +206,20 @@ public class ProfileActivity extends AppCompatActivity {
                 });
     }
 
+    private void disableEditMode() {
+        isEditMode = false;
+        etName.setEnabled(false);
+        etEmail.setEnabled(false);
+
+        // Update button UI back to edit mode
+        btnEditSubmit.setText("Edit Profile");
+        btnEditSubmit.setIcon(getDrawable(R.drawable.ic_edit));
+    }
+
     // ================= HELPERS =================
 
     private String nullSafe(String value) {
         return value == null ? "" : value;
-    }
-
-    private String formatDate(String iso) {
-        if (iso == null || iso.length() < 7) return "N/A";
-        try {
-            return iso.substring(0, 7).replace("-", " ");
-        } catch (Exception e) {
-            return "N/A";
-        }
     }
 
     private String capitalize(String value) {

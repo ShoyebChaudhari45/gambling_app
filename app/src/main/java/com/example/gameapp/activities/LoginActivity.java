@@ -1,5 +1,4 @@
 package com.example.gameapp.activities;
-import android.widget.TextView;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,7 +8,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.gameapp.R;
@@ -20,6 +18,8 @@ import com.example.gameapp.models.response.LoginResponse;
 import com.example.gameapp.session.SessionManager;
 import com.google.android.material.button.MaterialButton;
 
+import java.util.regex.Pattern;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -28,14 +28,20 @@ public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LOGIN_API";
 
-    EditText edtMobile, edtPassword;
-    View progressContainer;
+    private EditText edtMobile, edtPassword;
+    private View progressContainer;
+
+    // 🔐 Password rule:
+    // 1 uppercase, 1 lowercase, 1 number, 1 special char, min 8 chars
+    private static final Pattern PASSWORD_PATTERN = Pattern.compile(
+            "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&+=!]).{6,}$"
+    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // ✅ ONE-TIME AUTO LOGIN
+        // ✅ AUTO LOGIN
         if (SessionManager.isLoggedIn(this)) {
             startActivity(new Intent(this, HomeActivity.class));
             finish();
@@ -46,37 +52,53 @@ public class LoginActivity extends AppCompatActivity {
 
         edtMobile = findViewById(R.id.edtMobile);
         edtPassword = findViewById(R.id.edtPassword);
-        MaterialButton btnLogin = findViewById(R.id.btnLogin);
-        TextView txtSignup = findViewById(R.id.txtSignup);
         progressContainer = findViewById(R.id.progressContainer);
 
+        MaterialButton btnLogin = findViewById(R.id.btnLogin);
+        TextView txtSignup = findViewById(R.id.txtSignup);
         TextView txtForgot = findViewById(R.id.txtForgot);
 
-        txtForgot.setOnClickListener(v -> {
-            startActivity(new Intent(LoginActivity.this, ForgotPasswordActivity.class));
-        });
-
-
-        btnLogin.setOnClickListener(v -> loginUser());
+        txtForgot.setOnClickListener(v ->
+                startActivity(new Intent(this, ForgotPasswordActivity.class))
+        );
 
         txtSignup.setOnClickListener(v ->
-                startActivity(new Intent(LoginActivity.this, RegisterActivity.class))
+                startActivity(new Intent(this, RegisterActivity.class))
         );
+
+        btnLogin.setOnClickListener(v -> loginUser());
     }
 
+    // ================= LOGIN =================
     private void loginUser() {
 
         String mobile = edtMobile.getText().toString().trim();
         String password = edtPassword.getText().toString().trim();
 
-        // 🔐 VALIDATIONS
-        if (mobile.length() != 10) {
-            toast("Enter valid 10 digit mobile number");
+        // 📱 Mobile validation
+        if (mobile.isEmpty()) {
+            toast("Please enter mobile number");
             return;
         }
 
+        if (!mobile.matches("^[6-9]\\d{9}$")) {
+            toast("Enter a valid 10-digit mobile number");
+            return;
+        }
+
+        // 🔐 Password validation
         if (password.isEmpty()) {
-            toast("Enter password");
+            toast("Please enter password");
+            return;
+        }
+
+        if (!PASSWORD_PATTERN.matcher(password).matches()) {
+            toast("Password must contain:\n" +
+                    "• 1 uppercase letter\n" +
+                    "• 1 lowercase letter\n" +
+                    "• 1 number\n" +
+                    "• 1 special character\n" +
+                    "• Minimum 6 characters");
             return;
         }
 
@@ -86,14 +108,13 @@ public class LoginActivity extends AppCompatActivity {
         request.mobile_no = mobile;
         request.password = password;
 
-        ApiService api = ApiClient.getClient().create(ApiService.class);
-        api.login(request).enqueue(new Callback<LoginResponse>() {
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        apiService.login(request).enqueue(new Callback<LoginResponse>() {
 
             @Override
             public void onResponse(Call<LoginResponse> call,
                                    Response<LoginResponse> response) {
 
-                showLoader(false);
                 Log.d(TAG, "HTTP Code: " + response.code());
 
                 if (response.isSuccessful() && response.body() != null) {
@@ -101,49 +122,35 @@ public class LoginActivity extends AppCompatActivity {
                     String token = response.body().getToken();
 
                     if (token != null && !token.isEmpty()) {
-                        // ✅ LOGIN SUCCESS
                         SessionManager.saveLogin(LoginActivity.this, token);
-                        showSuccessDialog(response.body().getMessage());
+                        startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                        finish();
                     } else {
-                        // ❌ INVALID CREDENTIALS
+                        showLoader(false);
                         toast("Invalid mobile number or password");
                     }
 
                 } else {
+                    showLoader(false);
                     toast("Server error. Please try again");
                 }
             }
-
-
-
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
                 showLoader(false);
                 Log.e(TAG, "Login failed", t);
-                toast("Network error. Try again");
+                toast("Network error. Check your internet connection");
             }
         });
     }
 
-    // ✅ SUCCESS DIALOG AFTER LOGIN
-    private void showSuccessDialog(String message) {
-        new AlertDialog.Builder(this)
-                .setTitle("Login Successful")
-                .setMessage(message)
-                .setCancelable(false)
-                .setPositiveButton("Continue", (dialog, which) -> {
-                    startActivity(new Intent(LoginActivity.this, HomeActivity.class));
-                    finish();
-                })
-                .show();
-    }
-
+    // ================= HELPERS =================
     private void showLoader(boolean show) {
         progressContainer.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     private void toast(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
     }
 }

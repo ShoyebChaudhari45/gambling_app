@@ -11,12 +11,10 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.gameapp.Adapters.GameAdapter;
+import com.example.gameapp.Adapters.GameTapAdapter;
 import com.example.gameapp.R;
 import com.example.gameapp.api.ApiClient;
 import com.example.gameapp.api.ApiService;
-import com.example.gameapp.models.GameModel;
-import com.example.gameapp.models.response.GameResponse;
 import com.example.gameapp.models.response.TapsResponse;
 import com.example.gameapp.session.SessionManager;
 import com.google.android.material.navigation.NavigationView;
@@ -28,17 +26,18 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import android.util.Log;
 
 public class HomeActivity extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private ImageButton btnMenu;
-    private RecyclerView rvGames;
+    private RecyclerView rvGameTaps;
+    private static final String TAG = "HomeActivity";
 
-    private final List<TapsResponse.Tap> allTaps = new ArrayList<>();
-    private final List<GameModel> games = new ArrayList<>();
-    private GameAdapter gameAdapter;
+    private final List<TapsResponse.Tap> gameTaps = new ArrayList<>();
+    private GameTapAdapter gameTapAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +47,9 @@ public class HomeActivity extends AppCompatActivity {
         initViews();
         setupRecyclerView();
         setupDrawer();
+        setupActionButtons();
 
-        loadTaps();
+        loadGameTaps();
     }
 
     // ================= INIT =================
@@ -58,18 +58,45 @@ public class HomeActivity extends AppCompatActivity {
         drawerLayout = findViewById(R.id.drawerLayout);
         navigationView = findViewById(R.id.navigationView);
         btnMenu = findViewById(R.id.btnMenu);
-        rvGames = findViewById(R.id.rvGames);
+        rvGameTaps = findViewById(R.id.rvGameTaps);
     }
 
     private void setupRecyclerView() {
-        rvGames.setLayoutManager(new LinearLayoutManager(this));
+        rvGameTaps.setLayoutManager(new LinearLayoutManager(this));
 
-        gameAdapter = new GameAdapter(
+        gameTapAdapter = new GameTapAdapter(
                 this,
-                games,
+                gameTaps,
                 this::openGameDetails
         );
-        rvGames.setAdapter(gameAdapter);
+        rvGameTaps.setAdapter(gameTapAdapter);
+    }
+
+    // ================= ACTION BUTTONS =================
+
+    private void setupActionButtons() {
+        findViewById(R.id.btnWhatsApp).setOnClickListener(v -> {
+            // Open WhatsApp
+            toast("Opening WhatsApp...");
+        });
+
+        findViewById(R.id.btnTelegram).setOnClickListener(v -> {
+            // Open Telegram
+            toast("Opening Telegram...");
+        });
+
+        findViewById(R.id.btnStarline).setOnClickListener(v -> {
+            // Open Starline
+            toast("Opening Starline...");
+        });
+
+        findViewById(R.id.btnAddPoints).setOnClickListener(v -> {
+            startActivity(new Intent(this, AddPointsActivity.class));
+        });
+
+        findViewById(R.id.btnWithdraw).setOnClickListener(v -> {
+            startActivity(new Intent(this, WithdrawActivity.class));
+        });
     }
 
     // ================= DRAWER =================
@@ -85,7 +112,6 @@ public class HomeActivity extends AppCompatActivity {
             int id = item.getItemId();
 
             if (id == R.id.nav_home) {
-                // already on home
                 return true;
             }
 
@@ -131,7 +157,10 @@ public class HomeActivity extends AppCompatActivity {
 
     // ================= API FLOW =================
 
-    private void loadTaps() {
+    private void loadGameTaps() {
+
+        Log.d(TAG, "loadGameTaps: API call started");
+
         ApiClient.getClient()
                 .create(ApiService.class)
                 .getTaps("Bearer " + SessionManager.getToken(this))
@@ -141,68 +170,82 @@ public class HomeActivity extends AppCompatActivity {
                     public void onResponse(Call<TapsResponse> call,
                                            Response<TapsResponse> response) {
 
-                        if (response.isSuccessful()
-                                && response.body() != null
-                                && response.body().data != null
-                                && !response.body().data.isEmpty()
-                                && response.body().data.get(0).times != null) {
+                        Log.d(TAG, "onResponse: HTTP CODE = " + response.code());
 
-                            allTaps.clear();
-                            allTaps.addAll(response.body().data.get(0).times);
+                        if (response.isSuccessful() && response.body() != null) {
+
+                            Log.d(TAG, "onResponse: API SUCCESS");
+                            Log.d(TAG, "onResponse: RAW DATA = " + new Gson().toJson(response.body()));
+
+                            if (response.body().getData() == null) {
+                                Log.e(TAG, "onResponse: data is NULL");
+                                toast("No data found");
+                                return;
+                            }
+
+                            gameTaps.clear();
+
+                            for (TapsResponse.GameData game : response.body().getData()) {
+
+                                Log.d(TAG, "Game name = " + game.getName());
+
+                                if (game.getTimes() != null) {
+                                    for (TapsResponse.Tap tap : game.getTimes()) {
+
+                                        Log.d(TAG, "Tap item => "
+                                                + "type=" + tap.getType()
+                                                + ", endTime=" + tap.getEndTime()
+                                                + ", status=" + tap.getStatus()
+                                        );
+
+                                        // Inject game name
+                                        tap.setGameName(game.getName());
+                                        gameTaps.add(tap);
+                                    }
+                                } else {
+                                    Log.w(TAG, "No times found for game: " + game.getName());
+                                }
+                            }
+
+                            Log.d(TAG, "Total taps loaded = " + gameTaps.size());
+                            gameTapAdapter.notifyDataSetChanged();
+
+                        } else {
+                            Log.e(TAG, "API FAILED: " + response.message());
+                            toast("Failed to load games");
                         }
-
-                        loadGames();
                     }
 
                     @Override
                     public void onFailure(Call<TapsResponse> call, Throwable t) {
-                        loadGames();
-                    }
-                });
-    }
-
-    private void loadGames() {
-        ApiClient.getClient()
-                .create(ApiService.class)
-                .getGames("Bearer " + SessionManager.getToken(this))
-                .enqueue(new Callback<GameResponse>() {
-
-                    @Override
-                    public void onResponse(Call<GameResponse> call,
-                                           Response<GameResponse> response) {
-
-                        if (!response.isSuccessful()
-                                || response.body() == null
-                                || response.body().data == null) {
-                            toast("Failed to load games");
-                            return;
-                        }
-
-                        games.clear();
-
-                        for (GameResponse.Game g : response.body().data) {
-                            games.add(new GameModel(g.name, g.image));
-                        }
-
-                        gameAdapter.notifyDataSetChanged();
-                    }
-
-                    @Override
-                    public void onFailure(Call<GameResponse> call, Throwable t) {
+                        Log.e(TAG, "onFailure: " + t.getMessage(), t);
                         toast("Network error");
                     }
                 });
     }
 
+
+
+
     // ================= CLICK =================
 
-    private void openGameDetails(GameModel game) {
-        Intent i = new Intent(this, GameDetailsActivity.class);
-        i.putExtra("game_name", game.getName());
-        i.putExtra("game_image", game.getImage());
-        i.putExtra("taps", new Gson().toJson(allTaps));
+    private void openGameDetails(TapsResponse.Tap tap) {
+        Log.d(TAG, "openGameDetails: "
+                + "type=" + tap.getType()
+                + ", gameName=" + tap.getGameName()
+                + ", endTime=" + tap.getEndTime()
+                + ", status=" + tap.getStatus()
+        );
+
+        Intent i = new Intent(this, GameTypesActivity.class);
+        i.putExtra("tap_id", tap.getId());
+        i.putExtra("tap_type", tap.getType());
+        i.putExtra("game_name", tap.getGameName());
+        i.putExtra("end_time", tap.getEndTime());
+        i.putExtra("status", tap.getStatus());
         startActivity(i);
     }
+
 
     // ================= SHARE =================
 

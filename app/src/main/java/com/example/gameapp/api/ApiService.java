@@ -9,7 +9,7 @@ import com.example.gameapp.models.request.ResetPasswordRequest;
 import com.example.gameapp.models.request.UpdateProfileRequest;
 import com.example.gameapp.models.response.ChangePasswordResponse;
 import com.example.gameapp.models.response.CommonResponse;
-import com.example.gameapp.models.response.GameResponse;
+import com.example.gameapp.models.response.GamesResponse;
 import com.example.gameapp.models.response.GenericResponse;
 import com.example.gameapp.models.response.LoginResponse;
 import com.example.gameapp.models.response.PriceResponse;
@@ -79,7 +79,8 @@ public interface ApiService {
 
 
     @GET("games")
-    Call<GameResponse> getGames(@Header("Authorization") String authorization);
+    Call<GamesResponse> getGames(@Header("Authorization") String authorization);
+
 
     @GET("taps")
     Call<TapsResponse> getTaps(@Header("Authorization") String authorization);

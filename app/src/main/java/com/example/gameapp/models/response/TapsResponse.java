@@ -2,40 +2,64 @@ package com.example.gameapp.models.response;
 
 import com.google.gson.annotations.SerializedName;
 import java.util.List;
-
 public class TapsResponse {
 
-    @SerializedName("status_code")
-    public int statusCode;
-
-    @SerializedName("message")
-    public String message;
-
     @SerializedName("data")
-    public List<GameTap> data;
+    private List<GameData> data;
 
-    public static class GameTap {
-        @SerializedName("id")
-        public int id;
-
-        @SerializedName("name")
-        public String name;
-
-        @SerializedName("times")
-        public List<Tap> times;
+    public List<GameData> getData() {
+        return data;
     }
 
-    public static class Tap {
+    // ================= GAME =================
+    public static class GameData {
+
         @SerializedName("id")
-        public int id;
+        private int id;
+
+        @SerializedName("name")
+        private String name; // ✅ GAME NAME
+
+        @SerializedName("times")
+        private List<Tap> times;
+
+        public int getId() {
+            return id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public List<Tap> getTimes() {
+            return times;
+        }
+    }
+
+    // ================= TAP =================
+    public static class Tap {
+
+        @SerializedName("id")
+        private int id;
 
         @SerializedName("type")
-        public String type; // "open" or "close"
+        private String type;
 
         @SerializedName("end_time")
-        public String endTime;
+        private String endTime;
 
         @SerializedName("status")
-        public String status; // "closed" or "open"
+        private String status;
+
+        // runtime only (not from API)
+        private String gameName;
+
+        public int getId() { return id; }
+        public String getType() { return type; }
+        public String getEndTime() { return endTime; }
+        public String getStatus() { return status; }
+
+        public String getGameName() { return gameName; }
+        public void setGameName(String gameName) { this.gameName = gameName; }
     }
 }

@@ -1,74 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- PRIMARY THEME -->
-    <color name="colorPrimary">#6EC6FF</color>      <!-- Sky Blue -->
+    <!-- ================= BRAND / PRIMARY ================= -->
+    <color name="colorPrimary">#6EC6FF</color>
     <color name="colorPrimaryDark">#4FA8E8</color>
-    <color name="colorAccent">#FFD966</color>       <!-- Light Yellow -->
-
-    <!-- BACKGROUNDS (UPDATED – NOT WHITE LOOKING) -->
-    <color name="bg_main">#FFF6E8</color>      <!-- Warm cream (noticeably different from white) -->
-    <color name="strip_bg">#FFE8B0</color>     <!-- Light yellow but visible -->
-    <color name="input_bg">#FFFFFF</color>     <!-- Inputs always white -->
-    <color name="splash_bg">#6EC6FF</color>    <!-- Sky blue (perfect, no change) -->
-
-    <!-- TEXT -->
-    <color name="textPrimary">#2B2B2B</color>
-    <color name="textSecondary">#6B6B6B</color>
-    <color name="dark_text">#1E293B</color>
-    <color name="accent_dark">#1E3A8A</color>
-    <!-- Dark Theme Text Colors -->
-    <!-- White text on dark background -->
-    <color name="medium_text">#B0B0B0</color>    <!-- Light grey for secondary -->
-    <color name="light_text">#808080</color>     <!-- Medium grey for hints -->
-    <color name="text_disabled">#666666</color>  <!-- Darker grey for disabled -->
-
-    <!-- COMMON -->
-    <color name="white">#FFFFFF</color>
-    <color name="black">#FF000000</color>
-    <color name="whatsapp_green">#25D366</color>
-    <color name="sky_blue">#73C6FF</color>
-    <color name="dark_blue">#0D47A1</color>
-
-    <!-- colors.xml -->
-    <color name="primary">#3F51B5</color>      <!-- Indigo for primary actions -->
-    <color name="primary_dark">#303F9F</color> <!-- Darker indigo for toolbar -->
-    <color name="accent">#FF4081</color>       <!-- Pink accent for highlights -->
-    <color name="background">#F5F5F5</color>   <!-- Light grey background -->
-    <color name="card_bg">#FFFFFF</color>      <!-- White for cards -->
-    <color name="text_primary">#212121</color> <!-- Dark grey for primary text -->
-    <color name="text_secondary">#757575</color>
-    <color name="card_stroke">#424242</color>
-    <color name="divider">#E0E0E0</color>
     <color name="colorPrimaryLight">#E3F2FD</color>
-    <color name="error">#D32F2F</color>
-    <!-- Medium grey for secondary -->
+    <color name="colorAccent">#FFD966</color>
 
-
-
-    <!-- ================= PRIMARY BRAND COLORS ================= -->
-
-    <color name="light_blue">#E0ECFF</color>
+    <!-- ================= BACKGROUNDS ================= -->
+    <color name="bg_main">#FFF6E8</color>
+    <color name="strip_bg">#FFE8B0</color>
+    <color name="input_bg">#FFFFFF</color>
+    <color name="splash_bg">#6EC6FF</color>
+    <color name="background">#F5F5F5</color>
 
     <!-- ================= TEXT COLORS ================= -->
-      <!-- Soft Gray -->
+    <color name="textPrimary">#2B2B2B</color>
+    <color name="textSecondary">#6B6B6B</color>
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="dark_text">#1E293B</color>
+    <color name="accent_dark">#1E3A8A</color>
+    <color name="medium_text">#B0B0B0</color>
+    <color name="light_text">#808080</color>
+    <color name="text_disabled">#666666</color>
 
-    <!-- ================= STATUS COLORS ================= -->
-    <color name="green">#16A34A</color>           <!-- Open / Success -->
-    <color name="red">#DC2626</color>             <!-- Error / Closed -->
-    <color name="orange">#F59E0B</color>          <!-- Pending -->
+    <!-- ================= COMMON ================= -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#FF000000</color>
 
-    <!-- ================= DIVIDERS & BORDERS ================= -->
+    <!-- ================= PRIMARY UI COLORS ================= -->
+    <color name="primary">#3F51B5</color>
+    <color name="primary_dark">#303F9F</color>
+    <color name="accent">#FF4081</color>
 
+    <!-- ================= CARD / DIVIDER ================= -->
+    <color name="card_bg">#FFFFFF</color>
+    <color name="card_stroke">#424242</color>
+    <color name="divider">#E0E0E0</color>
     <color name="border">#D1D5DB</color>
 
-    <!-- ================= ICON TINTS ================= -->
+    <!-- ================= STATUS COLORS ================= -->
+    <color name="green">#16A34A</color>
+    <color name="red">#DC2626</color>
+    <color name="orange">#F59E0B</color>
+    <color name="error">#D32F2F</color>
+
+    <!-- ================= ICON COLORS ================= -->
     <color name="iconPrimary">#1E3A8A</color>
     <color name="iconSecondary">#6B7280</color>
 
-    <!-- ================= TRANSPARENT OVERLAY ================= -->
+    <!-- ================= EXTRA / UTIL ================= -->
+    <color name="sky_blue">#73C6FF</color>
+    <color name="dark_blue">#0D47A1</color>
+    <color name="light_blue">#E0ECFF</color>
+    <color name="whatsapp_green">#25D366</color>
     <color name="overlay_dark">#80000000</color>
-
-
 
 </resources>

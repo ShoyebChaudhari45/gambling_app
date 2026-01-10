@@ -4,63 +4,211 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="8dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="6dp"
-    app:cardBackgroundColor="@color/white">
+    android:layout_marginVertical="5dp"
+    android:layout_marginHorizontal="4dp"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="2dp"
+    app:strokeWidth="0dp"
+    app:cardBackgroundColor="@android:color/white">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:padding="14dp">
 
-        <!-- CLOCK ICON -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/iconCard"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            app:cardCornerRadius="22dp"
-            app:cardElevation="4dp"
-            app:cardBackgroundColor="@color/light_blue"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+        <!-- TOP SECTION -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-            <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_clock"
-                app:tint="@color/dark_blue" />
-        </com.google.android.material.card.MaterialCardView>
+            <!-- LEFT: Chart Icon + Game Info -->
+            <LinearLayout
+                android:id="@+id/leftSection"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
-        <!-- TAP TIME -->
-        <TextView
-            android:id="@+id/txtTap"
-            android:layout_width="0dp"
+                <!-- Chart Button -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/btnChart"
+                    android:layout_width="46dp"
+                    android:layout_height="46dp"
+                    app:cardCornerRadius="23dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#FFF3E0"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
+
+
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Game Type + Result -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txtGameName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="OPEN"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.02"/>
+
+                    <TextView
+                        android:id="@+id/txtResult"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="06:59 PM"
+                        android:textColor="#FF9800"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- RIGHT: Play Button -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnPlay"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                app:cardCornerRadius="23dp"
+                app:cardElevation="3dp"
+                app:cardBackgroundColor="@color/dark_blue"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_play"
+                    android:scaleType="fitCenter"
+                    app:tint="@android:color/white"/>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </RelativeLayout>
+
+        <!-- DIVIDER -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="12dp"
+            android:background="#F5F5F5"/>
+
+        <!-- BOTTOM INFO SECTION -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:text="10:00 AM - 11:00 AM"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="@color/textPrimary"
-            app:layout_constraintStart_toEndOf="@id/iconCard"
-            app:layout_constraintTop_toTopOf="@id/iconCard"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-        <!-- STATUS -->
+            <!-- Left Info -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#F5F5F5">
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_clock"
+                        android:scaleType="fitCenter"
+                        app:tint="@color/textSecondary"/>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/txtChartLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="End Time"
+                        android:textSize="12sp"
+                        android:textColor="@color/textSecondary"
+                        android:fontFamily="sans-serif"/>
+
+                    <TextView
+                        android:id="@+id/txtOpenTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="06:59 PM"
+                        android:textSize="12sp"
+                        android:textColor="@color/textPrimary"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Status Badge -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#FFEBEE">
+
+                <TextView
+                    android:id="@+id/txtStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="CLOSED"
+                    android:textColor="#DC143C"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.05"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="5dp"/>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+        <!-- CLOSE TIME (HIDDEN BY DEFAULT) -->
         <TextView
-            android:id="@+id/txtStatus"
+            android:id="@+id/txtCloseTime"
+            android:visibility="gone"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="OPEN"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            android:textColor="@color/green"
-            app:layout_constraintStart_toStartOf="@id/txtTap"
-            app:layout_constraintTop_toBottomOf="@id/txtTap"/>
+            android:layout_height="wrap_content"/>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>
