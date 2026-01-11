@@ -130,8 +130,7 @@ public class HomeActivity extends AppCompatActivity {
             } else if (id == R.id.nav_bid_history) {
                 startActivity(new Intent(this, BidHistoryActivity.class));
 
-            } else if (id == R.id.nav_win_history) {
-                startActivity(new Intent(this, WinHistoryActivity.class));
+
 
             } else if (id == R.id.nav_game_rates) {
                 startActivity(new Intent(this, GameRatesActivity.class));
