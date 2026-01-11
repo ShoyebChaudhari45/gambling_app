@@ -115,6 +115,13 @@ app/
 │
 ├── res/
 │   ├── layout/
+│   │   ├── activity_add_points.xml
+│   │   ├── activity_bid.xml
+│   │   ├── activity_game_rates.xml
+│   │   ├── activity_home.xml
+│   │   ├── activity_wallet_statement.xml
+│   │   └── activity_withdraw.xml
+│   │
 │   ├── drawable/
 │   ├── values/
 │   └── mipmap/
