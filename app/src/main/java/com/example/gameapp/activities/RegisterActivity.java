@@ -17,12 +17,15 @@ import com.example.gameapp.api.ApiService;
 import com.example.gameapp.models.request.RegisterRequest;
 import com.example.gameapp.models.response.RegisterResponse;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.regex.Pattern;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import android.text.InputType;
+
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -34,7 +37,9 @@ public class RegisterActivity extends AppCompatActivity {
     private TextView txtLogin;
     private View progressContainer;
 
-    // 🔐 Password: 1 upper, 1 lower, 1 number, 1 special, min 8
+    private TextInputLayout tilName, tilMobile, tilEmail, tilPassword;
+
+    // 🔐 Password rule
     private static final Pattern PASSWORD_PATTERN =
             Pattern.compile("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&+=!]).{6,}$");
 
@@ -52,6 +57,12 @@ public class RegisterActivity extends AppCompatActivity {
         txtLogin = findViewById(R.id.txtLogin);
         progressContainer = findViewById(R.id.progressContainer);
 
+        // 🔥 Get TextInputLayouts WITHOUT changing XML
+        tilName = (TextInputLayout) edtName.getParent().getParent();
+        tilMobile = (TextInputLayout) edtMobile.getParent().getParent();
+        tilEmail = (TextInputLayout) edtEmail.getParent().getParent();
+        tilPassword = findViewById(R.id.tilPassword);
+
         btnSignup.setOnClickListener(v -> registerUser());
 
         txtLogin.setOnClickListener(v ->
@@ -62,6 +73,8 @@ public class RegisterActivity extends AppCompatActivity {
     // ================= REGISTER =================
     private void registerUser() {
 
+        clearErrors();
+
         String name = edtName.getText().toString().trim();
         String mobile = edtMobile.getText().toString().trim();
         String email = edtEmail.getText().toString().trim();
@@ -69,36 +82,62 @@ public class RegisterActivity extends AppCompatActivity {
 
         // 👤 Name
         if (name.isEmpty()) {
-            toast("Please enter your name");
+            tilName.setError("Please enter your name");
+            edtName.requestFocus();
             return;
         }
 
         // 📱 Mobile
         if (!mobile.matches("^[6-9]\\d{9}$")) {
-            toast("Enter a valid 10-digit mobile number");
+            tilMobile.setError("Enter valid 10-digit mobile number");
+            edtMobile.requestFocus();
             return;
         }
 
         // 📧 Email
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            toast("Enter a valid email address");
+            tilEmail.setError("Enter a valid email address");
+            edtEmail.requestFocus();
             return;
         }
 
         // 🔐 Password
+        // 🔐 Password validation with AUTO VISIBILITY
         if (!PASSWORD_PATTERN.matcher(password).matches()) {
-            toast("Password must contain:\n" +
-                    "• 1 uppercase letter\n" +
-                    "• 1 lowercase letter\n" +
-                    "• 1 number\n" +
-                    "• 1 special character\n" +
-                    "• Minimum 6 characters");
+
+            // 👁 Password visible when error
+            edtPassword.setInputType(
+                    InputType.TYPE_CLASS_TEXT |
+                            InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+            );
+            edtPassword.setSelection(edtPassword.length());
+
+            // 🔴 SET REAL ERROR
+            tilPassword.setError(
+                    "Must contain uppercase, lowercase, number & special character"
+            );
+
+            edtPassword.requestFocus();
             return;
+
+        } else {
+
+            // 🔒 Hide password when valid
+            edtPassword.setInputType(
+                    InputType.TYPE_CLASS_TEXT |
+                            InputType.TYPE_TEXT_VARIATION_PASSWORD
+            );
+            edtPassword.setSelection(edtPassword.length());
+
+            // ✅ Clear error
+            tilPassword.setError(null);
         }
+
+
 
         // 👥 User type
         if (rgUserType.getCheckedRadioButtonId() == -1) {
-            toast("Please select user type");
+            Toast.makeText(this, "Please select user type", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -131,22 +170,6 @@ public class RegisterActivity extends AppCompatActivity {
                     return;
                 }
 
-                if (response.code() == 422 && response.errorBody() != null) {
-                    try {
-                        String error = response.errorBody().string();
-                        if (error.contains("email")) {
-                            toast("Email already exists");
-                        } else if (error.contains("mobile")) {
-                            toast("Mobile number already exists");
-                        } else {
-                            toast("Invalid input");
-                        }
-                    } catch (Exception e) {
-                        toast("Validation error");
-                    }
-                    return;
-                }
-
                 toast("Registration failed");
             }
 
@@ -159,6 +182,13 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     // ================= HELPERS =================
+    private void clearErrors() {
+        tilName.setError(null);
+        tilMobile.setError(null);
+        tilEmail.setError(null);
+        tilPassword.setError(null);
+    }
+
     private void showLoader(boolean show) {
         progressContainer.setVisibility(show ? View.VISIBLE : View.GONE);
         btnSignup.setEnabled(!show);

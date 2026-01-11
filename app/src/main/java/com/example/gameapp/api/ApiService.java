@@ -1,6 +1,7 @@
 package com.example.gameapp.api;
 
 import com.example.gameapp.models.request.ChangePasswordRequest;
+import com.example.gameapp.models.request.DepositRequest;
 import com.example.gameapp.models.request.ForgotPasswordRequest;
 import com.example.gameapp.models.request.LoginRequest;
 import com.example.gameapp.models.request.RegisterRequest;
@@ -9,6 +10,7 @@ import com.example.gameapp.models.request.ResetPasswordRequest;
 import com.example.gameapp.models.request.UpdateProfileRequest;
 import com.example.gameapp.models.response.ChangePasswordResponse;
 import com.example.gameapp.models.response.CommonResponse;
+import com.example.gameapp.models.response.DepositResponse;
 import com.example.gameapp.models.response.GamesResponse;
 import com.example.gameapp.models.response.GenericResponse;
 import com.example.gameapp.models.response.LoginResponse;
@@ -90,6 +92,16 @@ public interface ApiService {
             @Header("Authorization") String token,
             @Header("Accept") String accept,
             @Body UpdateProfileRequest request
+    );
+
+    @Headers({
+            "Accept: application/json",
+            "Content-Type: application/json"
+    })
+    @POST("wallet/deposit")
+    Call<DepositResponse> depositAmount(
+            @Header("Authorization") String token,
+            @Body DepositRequest request
     );
 
 }

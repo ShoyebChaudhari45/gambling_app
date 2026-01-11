@@ -1,21 +1,36 @@
 package com.example.gameapp.activities;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.GridLayout;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.gameapp.R;
+import com.example.gameapp.api.ApiClient;
+import com.example.gameapp.api.ApiService;
+import com.example.gameapp.models.request.DepositRequest;
+import com.example.gameapp.models.response.DepositResponse;
+import com.example.gameapp.session.SessionManager;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AddPointsActivity extends AppCompatActivity {
 
     private long lastBackPressedTime = 0;
+
+    private EditText edtPoints;
+    private TextView txtPoints;
+    private ProgressDialog progressDialog;
+
+    private ApiService apiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,84 +38,126 @@ public class AddPointsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_points);
 
         // ================= VIEWS =================
-        EditText edtPoints = findViewById(R.id.enterBox)
+        edtPoints = findViewById(R.id.enterBox)
                 .findViewById(android.R.id.edit);
 
+        txtPoints = findViewById(R.id.txtPoints);
+
         Button btnAddPoints = findViewById(R.id.btnAddPoints);
-        GridLayout grid = findViewById(R.id.grid);
         ImageButton btnBack = findViewById(R.id.btnBack);
 
-        // ================= BACK BUTTON =================
+        Button btn500 = findViewById(R.id.btn500);
+        Button btn1000 = findViewById(R.id.btn1000);
+        Button btn2000 = findViewById(R.id.btn2000);
+        Button btn5000 = findViewById(R.id.btn5000);
+        Button btn10000 = findViewById(R.id.btn10000);
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Processing...");
+        progressDialog.setCancelable(false);
+
+        apiService = ApiClient.getClient().create(ApiService.class);
+
+        // ================= SHOW BALANCE =================
+        txtPoints.setText(String.valueOf(SessionManager.getBalance(this)));
+
+        // ================= BACK =================
         btnBack.setOnClickListener(v -> {
-            Intent intent = new Intent(AddPointsActivity.this, HomeActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            startActivity(intent);
+            startActivity(new Intent(this, HomeActivity.class)
+                    .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             finish();
         });
 
-        // ================= QUICK AMOUNT BUTTONS =================
-        for (int i = 0; i < grid.getChildCount(); i++) {
-            View view = grid.getChildAt(i);
+        // ================= QUICK BUTTONS =================
+        btn500.setOnClickListener(v -> edtPoints.setText("500"));
+        btn1000.setOnClickListener(v -> edtPoints.setText("1000"));
+        btn2000.setOnClickListener(v -> edtPoints.setText("2000"));
+        btn5000.setOnClickListener(v -> edtPoints.setText("5000"));
+        btn10000.setOnClickListener(v -> edtPoints.setText("10000"));
 
-            if (view instanceof Button) {
-                Button button = (Button) view;
-
-                button.setOnClickListener(v -> {
-                    String amount = button.getText().toString();
-                    edtPoints.setText(amount);
-                    Toast.makeText(
-                            this,
-                            "Selected: " + amount,
-                            Toast.LENGTH_SHORT
-                    ).show();
-                });
-            }
-        }
-
-        // ================= ADD POINTS BUTTON =================
+        // ================= ADD POINTS =================
         btnAddPoints.setOnClickListener(v -> {
-            String amount = edtPoints.getText().toString().trim();
+            String amountStr = edtPoints.getText().toString().trim();
 
-            if (amount.isEmpty()) {
-                Toast.makeText(this, "Please enter points", Toast.LENGTH_SHORT).show();
+            if (amountStr.isEmpty()) {
+                Toast.makeText(this, "Enter amount", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            Toast.makeText(
-                    this,
-                    "Add Points clicked: " + amount,
-                    Toast.LENGTH_SHORT
-            ).show();
+            int amount = Integer.parseInt(amountStr);
+
+            if (amount < 300) {
+                Toast.makeText(this, "Minimum deposit ₹300", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            callDepositApi(amount);
         });
     }
 
-    // ================= SYSTEM BACK =================
-    @Override
-    public void onBackPressed() {
-        handleBackPress();
+    // ================= API CALL =================
+    private void callDepositApi(int amount) {
+
+        progressDialog.show();
+
+        DepositRequest request = new DepositRequest(amount);
+
+        apiService.depositAmount(
+                "Bearer " + SessionManager.getToken(this),
+                request
+        ).enqueue(new Callback<DepositResponse>() {
+            @Override
+            public void onResponse(Call<DepositResponse> call, Response<DepositResponse> response) {
+
+                progressDialog.dismiss();
+
+                if (response.isSuccessful() && response.body() != null) {
+
+                    int currentBalance = SessionManager.getBalance(AddPointsActivity.this);
+                    int newBalance = currentBalance + amount;
+
+                    SessionManager.saveBalance(AddPointsActivity.this, newBalance);
+
+                    txtPoints.setText(String.valueOf(newBalance));
+                    edtPoints.setText("");
+
+                    Toast.makeText(
+                            AddPointsActivity.this,
+                            response.body().getMessage(),
+                            Toast.LENGTH_LONG
+                    ).show();
+
+                } else {
+                    Toast.makeText(
+                            AddPointsActivity.this,
+                            "Deposit failed",
+                            Toast.LENGTH_SHORT
+                    ).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<DepositResponse> call, Throwable t) {
+                progressDialog.dismiss();
+                Toast.makeText(
+                        AddPointsActivity.this,
+                        "Error: " + t.getMessage(),
+                        Toast.LENGTH_SHORT
+                ).show();
+            }
+        });
     }
 
-    // ================= BACK LOGIC =================
-    private void handleBackPress() {
-
+    // ================= BACK PRESS =================
+    @Override
+    public void onBackPressed() {
         long currentTime = System.currentTimeMillis();
 
         if (currentTime - lastBackPressedTime < 2000) {
-            // ✅ DOUBLE TAP → EXIT ACTIVITY
             finish();
         } else {
-            // ✅ SINGLE TAP → GO TO HOME
             lastBackPressedTime = currentTime;
-
-            Toast.makeText(
-                    this,
-                    "Press back again to exit",
-                    Toast.LENGTH_SHORT
-            ).show();
-
-            Intent intent = new Intent(AddPointsActivity.this, HomeActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            startActivity(intent);
+            Toast.makeText(this, "Press back again to exit", Toast.LENGTH_SHORT).show();
         }
     }
 }

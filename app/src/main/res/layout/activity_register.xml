@@ -162,6 +162,7 @@
 
             <!-- PASSWORD -->
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
@@ -177,9 +178,11 @@
                 app:startIconDrawable="@drawable/ic_lock"
                 app:startIconTint="@color/colorPrimary"
                 app:endIconMode="password_toggle"
-                app:endIconTint="@color/colorPrimary">
+                app:endIconTint="@color/colorPrimary"
+                app:errorEnabled="true"
+                app:helperText="Min 6 chars, 1 upper, 1 lower, 1 number , 1 special char">
 
-                <com.google.android.material.textfield.TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edtPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
