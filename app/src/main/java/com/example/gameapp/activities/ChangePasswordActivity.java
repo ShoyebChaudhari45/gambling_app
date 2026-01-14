@@ -116,14 +116,15 @@ public class ChangePasswordActivity extends AppCompatActivity {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
+    // =====================================================
+    // BACK PRESS (DOUBLE TAP EXIT)
+    // =====================================================
     @Override
     public void onBackPressed() {
-        long currentTime = System.currentTimeMillis();
-        if (currentTime - lastBackPressedTime < 2000) {
-            finish();
-        } else {
-            lastBackPressedTime = currentTime;
-            Toast.makeText(this, "Press back again to exit", Toast.LENGTH_SHORT).show();
-        }
+        // Go back to Home Activity
+        Intent intent = new Intent(this, HomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        finish();
     }
 }

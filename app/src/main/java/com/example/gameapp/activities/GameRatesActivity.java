@@ -1,5 +1,6 @@
 package com.example.gameapp.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageButton;
@@ -15,6 +16,8 @@ import com.example.gameapp.Adapters.GameRateAdapter;
 import com.example.gameapp.api.ApiClient;
 import com.example.gameapp.api.ApiService;
 import com.example.gameapp.models.GameRateModel;
+import com.example.gameapp.models.response.GameRateItem;
+import com.example.gameapp.models.response.GameRateResponse;
 import com.example.gameapp.models.response.PriceResponse;
 import com.example.gameapp.session.SessionManager;
 
@@ -50,66 +53,43 @@ public class GameRatesActivity extends AppCompatActivity {
 
         ApiClient.getClient()
                 .create(ApiService.class)
-                .getPrices(token, "application/json")
-                .enqueue(new Callback<PriceResponse>() {
+                .getGameRates(token)
+                .enqueue(new Callback<GameRateResponse>() {
 
                     @Override
-                    public void onResponse(Call<PriceResponse> call,
-                                           Response<PriceResponse> response) {
+                    public void onResponse(Call<GameRateResponse> call,
+                                           Response<GameRateResponse> response) {
 
-                        Log.d("PRICE_API", "HTTP CODE: " + response.code());
+                        if (!response.isSuccessful()
+                                || response.body() == null
+                                || response.body().getData() == null) {
 
-                        if (!response.isSuccessful() || response.body() == null) {
                             Toast.makeText(GameRatesActivity.this,
                                     "Failed to load rates",
                                     Toast.LENGTH_SHORT).show();
                             return;
                         }
 
-                        Log.d("PRICE_API", "DATA = " + response.body().data);
-
-                        if (response.body().data == null || response.body().data.isEmpty()) {
-                            Toast.makeText(GameRatesActivity.this,
-                                    "No rates available",
-                                    Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
                         List<GameRateModel> list = new ArrayList<>();
 
-                        for (String amount : response.body().data) {
+                        for (GameRateItem item : response.body().getData()) {
 
-                            String rate;
+                            String name = item.getGame();
+                            String rate = item.getDigit();
 
-                            switch (amount) {
-                                case "500":
-                                    rate = "10 - 95";
-                                    break;
-                                case "1000":
-                                    rate = "10 - 950";
-                                    break;
-                                case "2000":
-                                    rate = "10 - 3000";
-                                    break;
-                                case "5000":
-                                    rate = "10 - 7000";
-                                    break;
-                                case "10000":
-                                    rate = "10 - 10000";
-                                    break;
-                                default:
-                                    rate = amount;
+                            // fallback if digit missing
+                            if (rate == null || rate.isEmpty()) {
+                                rate = "-";
                             }
 
-                            list.add(new GameRateModel("Amount " + amount, rate));
+                            list.add(new GameRateModel(name, rate));
                         }
 
                         rv.setAdapter(new GameRateAdapter(list));
                     }
 
                     @Override
-                    public void onFailure(Call<PriceResponse> call, Throwable t) {
-                        Log.e("PRICE_API", "NETWORK ERROR", t);
+                    public void onFailure(Call<GameRateResponse> call, Throwable t) {
                         Toast.makeText(GameRatesActivity.this,
                                 "Network error",
                                 Toast.LENGTH_SHORT).show();
@@ -118,14 +98,16 @@ public class GameRatesActivity extends AppCompatActivity {
     }
 
 
+
+    // =====================================================
+    // BACK PRESS (DOUBLE TAP EXIT)
+    // =====================================================
     @Override
     public void onBackPressed() {
-        long currentTime = System.currentTimeMillis();
-        if (currentTime - lastBackPressedTime < 2000) {
-            finish();
-        } else {
-            lastBackPressedTime = currentTime;
-            Toast.makeText(this, "Press back again to exit", Toast.LENGTH_SHORT).show();
-        }
+        // Go back to Home Activity
+        Intent intent = new Intent(this, HomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        finish();
     }
 }

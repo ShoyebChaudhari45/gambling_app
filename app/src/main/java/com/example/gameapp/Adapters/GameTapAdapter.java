@@ -17,131 +17,151 @@ import com.google.android.material.card.MaterialCardView;
 
 import java.util.List;
 
-public class GameTapAdapter extends RecyclerView.Adapter<GameTapAdapter.ViewHolder> {
+public class GameTapAdapter
+        extends RecyclerView.Adapter<GameTapAdapter.Holder> {
 
-    private Context context;
-    private List<GameItem> gameItems;
-    private OnGameClickListener listener;
-
-    public interface OnGameClickListener {
-        void onGameClick(TapsResponse.Tap tap, String gameType);
+    public interface OnGameTapClickListener {
+        void onGameTapClick(TapsResponse.Tap tap, String type);
     }
 
-    public GameTapAdapter(Context context, List<GameItem> gameItems, OnGameClickListener listener) {
+    private final Context context;
+    private final List<GameItem> list;
+    private final OnGameTapClickListener listener;
+
+    public GameTapAdapter(Context context,
+                          List<GameItem> list,
+                          OnGameTapClickListener listener) {
         this.context = context;
-        this.gameItems = gameItems;
+        this.list = list;
         this.listener = listener;
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_tap, parent, false);
-        return new ViewHolder(view);
+    public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(context)
+                .inflate(R.layout.item_tap, parent, false);
+        return new Holder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        GameItem item = gameItems.get(position);
+    public void onBindViewHolder(@NonNull Holder h, int position) {
 
-        holder.txtGameName.setText(item.getGameName());
+        GameItem item = list.get(position);
 
-        // Determine if we need the middle divider
-        boolean showDivider = item.hasOpenTap() && item.hasCloseTap();
-        holder.dividerMiddle.setVisibility(showDivider ? View.VISIBLE : View.GONE);
+        TapsResponse.Tap openTap  = item.getOpenTap();
+        TapsResponse.Tap closeTap = item.getCloseTap();
 
-        // Setup OPEN section
-        if (item.hasOpenTap()) {
-            holder.layoutOpen.setVisibility(View.VISIBLE);
-            TapsResponse.Tap openTap = item.getOpenTap();
+        // ================= GAME NAME =================
+        h.txtGameName.setText(item.getGameName().toUpperCase());
 
-            holder.txtOpenTime.setText(openTap.getEndTime());
-            setupStatus(holder.txtOpenStatus, holder.cardOpenStatus, openTap.getStatus());
-            setupPlayButton(holder.btnPlayOpen, holder.imgPlayIconOpen, openTap.getStatus());
+        // RESULT (STATIC)
+        h.txtResultCode.setText("***-**-***");
 
-            // Set click listener only if not closed
-            if (isClickable(openTap.getStatus())) {
-                holder.btnPlayOpen.setOnClickListener(v ->
-                        listener.onGameClick(openTap, "open")
-                );
-            } else {
-                holder.btnPlayOpen.setOnClickListener(null);
-            }
-        } else {
-            holder.layoutOpen.setVisibility(View.GONE);
+        // ================= TIME LOGIC =================
+        String openTime  = "--:--";
+        String closeTime = "--:--";
+
+        if (openTap != null && openTap.getEndTime() != null) {
+            openTime = openTap.getEndTime();
         }
 
-        // Setup CLOSE section
-        if (item.hasCloseTap()) {
-            holder.layoutClose.setVisibility(View.VISIBLE);
-            TapsResponse.Tap closeTap = item.getCloseTap();
+        if (closeTap != null && closeTap.getEndTime() != null) {
+            closeTime = closeTap.getEndTime();
+        }
 
-            holder.txtCloseTime.setText(closeTap.getEndTime());
-            setupStatus(holder.txtCloseStatus, holder.cardCloseStatus, closeTap.getStatus());
-            setupPlayButton(holder.btnPlayClose, holder.imgPlayIconClose, closeTap.getStatus());
+        h.txtOpenTime.setText(openTime);
+        h.txtCloseTime.setText(closeTime);
 
-            // Set click listener only if not closed
-            if (isClickable(closeTap.getStatus())) {
-                holder.btnPlayClose.setOnClickListener(v ->
-                        listener.onGameClick(closeTap, "close")
-                );
-            } else {
-                holder.btnPlayClose.setOnClickListener(null);
-            }
+        // ================= STATUS DECISION =================
+        String status;
+        TapsResponse.Tap playableTap = null;
+        String tapType = null;
+
+        if (openTap != null) {
+            status = openTap.getStatus();
+            playableTap = openTap;
+            tapType = "open";
+        } else if (closeTap != null) {
+            status = closeTap.getStatus();
+            playableTap = closeTap;
+            tapType = "close";
         } else {
-            holder.layoutClose.setVisibility(View.GONE);
+            status = "closed";
+        }
+
+        // ================= STATUS UI =================
+        setupStatus(h.txtStatus, h.cardStatus, h.txtPlayGame, status);
+
+        // ================= PLAY BUTTON =================
+        boolean isPlayable = "open".equalsIgnoreCase(status);
+
+        setupPlayButton(h.btnPlay, h.imgPlayIcon, isPlayable);
+
+        // ================= CLICK =================
+        if (isPlayable && playableTap != null) {
+            TapsResponse.Tap finalTap = playableTap;
+            String finalType = tapType;
+
+            h.cardGame.setOnClickListener(v ->
+                    listener.onGameTapClick(finalTap, finalType));
+
+            h.btnPlay.setOnClickListener(v ->
+                    listener.onGameTapClick(finalTap, finalType));
+        } else {
+            h.cardGame.setOnClickListener(null);
+            h.btnPlay.setOnClickListener(null);
         }
     }
 
-    private boolean isClickable(String status) {
-        if (status == null) return false;
-        String statusLower = status.toLowerCase();
-        return statusLower.equals("open") ||
-                statusLower.equals("upcoming") ||
-                statusLower.equals("running");
-    }
+    // ================= STATUS UI =================
+    private void setupStatus(TextView txtStatus,
+                             MaterialCardView cardStatus,
+                             TextView txtPlayGame,
+                             String status) {
 
-    private void setupStatus(TextView txtStatus, MaterialCardView cardStatus, String status) {
         if (status == null) status = "closed";
 
         switch (status.toLowerCase()) {
+
             case "open":
-            case "upcoming":
                 txtStatus.setText("OPEN");
                 txtStatus.setTextColor(0xFF4CAF50);
                 cardStatus.setCardBackgroundColor(0xFFE8F5E9);
+                txtPlayGame.setTextColor(0xFF4CAF50);
                 break;
 
-            case "running":
-                txtStatus.setText("RUNNING");
-                txtStatus.setTextColor(0xFFFF9800);
-                cardStatus.setCardBackgroundColor(0xFFFFF3E0);
+            case "upcoming":
+                txtStatus.setText("UPCOMING");
+                txtStatus.setTextColor(0xFF4CAF50);
+                cardStatus.setCardBackgroundColor(0xFFE8F5E9);
+                txtPlayGame.setTextColor(0xFF999999);
                 break;
 
-            case "closed":
             default:
                 txtStatus.setText("CLOSED");
-                txtStatus.setTextColor(0xFFDC143C);
+                txtStatus.setTextColor(0xFFD32F2F);
                 cardStatus.setCardBackgroundColor(0xFFFFEBEE);
+                txtPlayGame.setTextColor(0xFF999999);
                 break;
         }
     }
 
-    private void setupPlayButton(MaterialCardView btnPlay, ImageView imgIcon, String status) {
-        boolean clickable = isClickable(status);
+    // ================= PLAY BUTTON =================
+    private void setupPlayButton(MaterialCardView btnPlay,
+                                 ImageView imgIcon,
+                                 boolean enabled) {
 
-        btnPlay.setClickable(clickable);
-        btnPlay.setFocusable(clickable);
+        btnPlay.setClickable(enabled);
+        btnPlay.setFocusable(enabled);
 
-        if (clickable) {
-            // Active state
-            btnPlay.setCardBackgroundColor(context.getResources().getColor(R.color.dark_blue));
+        if (enabled) {
+            btnPlay.setCardBackgroundColor(0xFFD32F2F);
             btnPlay.setCardElevation(4f);
-            btnPlay.setAlpha(1.0f);
-            imgIcon.setAlpha(1.0f);
+            btnPlay.setAlpha(1f);
+            imgIcon.setAlpha(1f);
         } else {
-            // Disabled state
-            btnPlay.setCardBackgroundColor(0xFFBDBDBD); // Gray color
+            btnPlay.setCardBackgroundColor(0xFFBDBDBD);
             btnPlay.setCardElevation(0f);
             btnPlay.setAlpha(0.5f);
             imgIcon.setAlpha(0.5f);
@@ -150,42 +170,31 @@ public class GameTapAdapter extends RecyclerView.Adapter<GameTapAdapter.ViewHold
 
     @Override
     public int getItemCount() {
-        return gameItems.size();
+        return list == null ? 0 : list.size();
     }
 
-    public void updateData(List<GameItem> newGameItems) {
-        this.gameItems = newGameItems;
-        notifyDataSetChanged();
-    }
+    // ================= HOLDER =================
+    static class Holder extends RecyclerView.ViewHolder {
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView txtGameName, txtOpenTime, txtCloseTime;
-        TextView txtOpenStatus, txtCloseStatus;
-        MaterialCardView cardOpenStatus, cardCloseStatus;
-        MaterialCardView btnPlayOpen, btnPlayClose;
-        ImageView imgPlayIconOpen, imgPlayIconClose;
-        View layoutOpen, layoutClose, dividerMiddle;
+        MaterialCardView cardGame, cardStatus, btnPlay;
+        TextView txtGameName, txtResultCode,
+                txtOpenTime, txtCloseTime,
+                txtStatus, txtPlayGame;
+        ImageView imgPlayIcon;
 
-        ViewHolder(@NonNull View itemView) {
-            super(itemView);
+        Holder(@NonNull View v) {
+            super(v);
 
-            txtGameName = itemView.findViewById(R.id.txtGameName);
-
-            layoutOpen = itemView.findViewById(R.id.layoutOpen);
-            txtOpenTime = itemView.findViewById(R.id.txtOpenTime);
-            txtOpenStatus = itemView.findViewById(R.id.txtOpenStatus);
-            cardOpenStatus = itemView.findViewById(R.id.cardOpenStatus);
-            btnPlayOpen = itemView.findViewById(R.id.btnPlayOpen);
-            imgPlayIconOpen = itemView.findViewById(R.id.imgPlayIconOpen);
-
-            layoutClose = itemView.findViewById(R.id.layoutClose);
-            txtCloseTime = itemView.findViewById(R.id.txtCloseTime);
-            txtCloseStatus = itemView.findViewById(R.id.txtCloseStatus);
-            cardCloseStatus = itemView.findViewById(R.id.cardCloseStatus);
-            btnPlayClose = itemView.findViewById(R.id.btnPlayClose);
-            imgPlayIconClose = itemView.findViewById(R.id.imgPlayIconClose);
-
-            dividerMiddle = itemView.findViewById(R.id.dividerMiddle);
+            cardGame = v.findViewById(R.id.cardGame);
+            txtGameName = v.findViewById(R.id.txtGameName);
+            txtResultCode = v.findViewById(R.id.txtResultCode);
+            txtOpenTime = v.findViewById(R.id.txtOpenTime);
+            txtCloseTime = v.findViewById(R.id.txtCloseTime);
+            txtStatus = v.findViewById(R.id.txtStatus);
+            cardStatus = v.findViewById(R.id.cardStatus);
+            btnPlay = v.findViewById(R.id.btnPlay);
+            imgPlayIcon = v.findViewById(R.id.imgPlayIcon);
+            txtPlayGame = v.findViewById(R.id.txtPlayGame);
         }
     }
 }

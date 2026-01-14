@@ -102,8 +102,7 @@
                     android:layout_width="28dp"
                     android:layout_height="28dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_diamond"
-                    />
+                    android:src="@drawable/ic_diamond"/>
             </com.google.android.material.card.MaterialCardView>
 
             <LinearLayout
@@ -321,155 +320,153 @@
                 android:alpha="0.7"
                 android:layout_marginBottom="12dp"/>
 
-            <!-- PROPERLY ALIGNED QUICK BUTTONS GRID -->
-            <GridLayout
+            <!-- FIXED LINEAR LAYOUT GRID -->
+            <LinearLayout
                 android:id="@+id/grid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                android:columnCount="3"
-                android:alignmentMode="alignMargins"
-                android:useDefaultMargins="true"
-                android:columnOrderPreserved="false">
+                android:orientation="vertical"
+                android:layout_marginBottom="24dp">
 
-
-            <!-- Row 1 -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
+                <!-- ROW 1: Three equal buttons -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_row="0"
-                    android:layout_column="0"
-                    android:layout_columnWeight="1"
-                    android:layout_marginEnd="6dp"
-                    android:layout_marginBottom="12dp"
-                    app:cardCornerRadius="14dp"
-                    app:cardElevation="2dp"
-                    app:cardBackgroundColor="@android:color/white"
-                    app:strokeColor="@color/dark_blue"
-                    app:strokeWidth="2dp">
+                    android:orientation="horizontal"
+                    android:weightSum="3"
+                    android:layout_marginBottom="12dp">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn500"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="64dp"
-                        android:text="₹500"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/dark_blue"
-                        android:fontFamily="sans-serif-medium"
-                        app:rippleColor="#FFF9C4"/>
-                </com.google.android.material.card.MaterialCardView>
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        app:cardCornerRadius="14dp"
+                        app:cardElevation="2dp"
+                        app:cardBackgroundColor="@android:color/white"
+                        app:strokeColor="@color/dark_blue"
+                        app:strokeWidth="2dp">
 
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn500"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="60dp"
+                            android:text="₹500"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/dark_blue"
+                            android:fontFamily="sans-serif-medium"
+                            app:rippleColor="#FFF9C4"/>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="6dp"
+                        android:layout_marginEnd="6dp"
+                        app:cardCornerRadius="14dp"
+                        app:cardElevation="2dp"
+                        app:cardBackgroundColor="@android:color/white"
+                        app:strokeColor="@color/dark_blue"
+                        app:strokeWidth="2dp">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn1000"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="60dp"
+                            android:text="₹1000"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/dark_blue"
+                            android:fontFamily="sans-serif-medium"
+                            app:rippleColor="#FFF9C4"/>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="6dp"
+                        app:cardCornerRadius="14dp"
+                        app:cardElevation="2dp"
+                        app:cardBackgroundColor="@android:color/white"
+                        app:strokeColor="@color/dark_blue"
+                        app:strokeWidth="2dp">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn2000"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="60dp"
+                            android:text="₹2000"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/dark_blue"
+                            android:fontFamily="sans-serif-medium"
+                            app:rippleColor="#FFF9C4"/>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+
+                <!-- ROW 2: One button + One large button -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_row="0"
-                    android:layout_column="1"
-                    android:layout_columnWeight="1"
-                    android:layout_marginStart="3dp"
-                    android:layout_marginEnd="3dp"
-                    android:layout_marginBottom="12dp"
-                    app:cardCornerRadius="14dp"
-                    app:cardElevation="2dp"
-                    app:cardBackgroundColor="@android:color/white"
-                    app:strokeColor="@color/dark_blue"
-                    app:strokeWidth="2dp">
+                    android:orientation="horizontal"
+                    android:weightSum="3">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn1000"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="64dp"
-                        android:text="₹1000"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/dark_blue"
-                        android:fontFamily="sans-serif-medium"
-                        app:rippleColor="#FFF9C4"/>
-                </com.google.android.material.card.MaterialCardView>
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        app:cardCornerRadius="14dp"
+                        app:cardElevation="2dp"
+                        app:cardBackgroundColor="@android:color/white"
+                        app:strokeColor="@color/dark_blue"
+                        app:strokeWidth="2dp">
 
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_row="0"
-                    android:layout_column="2"
-                    android:layout_columnWeight="1"
-                    android:layout_marginStart="6dp"
-                    android:layout_marginBottom="12dp"
-                    app:cardCornerRadius="14dp"
-                    app:cardElevation="2dp"
-                    app:cardBackgroundColor="@android:color/white"
-                    app:strokeColor="@color/dark_blue"
-                    app:strokeWidth="2dp">
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn5000"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="60dp"
+                            android:text="₹5000"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/dark_blue"
+                            android:fontFamily="sans-serif-medium"
+                            app:rippleColor="#FFF9C4"/>
+                    </com.google.android.material.card.MaterialCardView>
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn2000"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="64dp"
-                        android:text="₹2000"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/dark_blue"
-                        android:fontFamily="sans-serif-medium"
-                        app:rippleColor="#FFF9C4"/>
-                </com.google.android.material.card.MaterialCardView>
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:layout_marginStart="6dp"
+                        app:cardCornerRadius="14dp"
+                        app:cardElevation="2dp"
+                        app:cardBackgroundColor="#FFF9C4"
+                        app:strokeColor="@color/dark_blue"
+                        app:strokeWidth="2dp">
 
-                <!-- Row 2 -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_row="1"
-                    android:layout_column="0"
-                    android:layout_columnWeight="1"
-                    android:layout_marginEnd="6dp"
-                    app:cardCornerRadius="14dp"
-                    app:cardElevation="2dp"
-                    app:cardBackgroundColor="@android:color/white"
-                    app:strokeColor="@color/dark_blue"
-                    app:strokeWidth="2dp">
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn10000"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="60dp"
+                            android:text="₹10000"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/dark_blue"
+                            android:fontFamily="sans-serif-medium"
+                            app:rippleColor="@color/dark_blue"/>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn5000"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="64dp"
-                        android:text="₹5000"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/dark_blue"
-                        android:fontFamily="sans-serif-medium"
-                        app:rippleColor="#FFF9C4"/>
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_row="1"
-                    android:layout_column="1"
-                    android:layout_columnSpan="2"
-                    android:layout_columnWeight="2"
-                    android:layout_marginStart="6dp"
-                    app:cardCornerRadius="14dp"
-                    app:cardElevation="2dp"
-                    app:cardBackgroundColor="#FFF9C4"
-                    app:strokeColor="@color/dark_blue"
-                    app:strokeWidth="2dp">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn10000"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="64dp"
-                        android:text="₹10000"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/dark_blue"
-                        android:fontFamily="sans-serif-medium"
-                        app:rippleColor="@color/dark_blue"/>
-                </com.google.android.material.card.MaterialCardView>
-            </GridLayout>
+            </LinearLayout>
 
             <!-- ENHANCED ADD POINTS BUTTON -->
             <com.google.android.material.button.MaterialButton

@@ -12,68 +12,66 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.gameapp.R;
-import com.example.gameapp.models.response.GamesResponse;
-import com.google.android.material.card.MaterialCardView;
+import com.example.gameapp.models.GameType;
 
 import java.util.List;
 
-public class GameTypeAdapter extends RecyclerView.Adapter<GameTypeAdapter.ViewHolder> {
+public class GameTypeAdapter
+        extends RecyclerView.Adapter<GameTypeAdapter.Holder> {
 
-    private final Context context;
-    private final List<GamesResponse.Game> games;
-    private final OnGameClickListener listener;
-
-    public interface OnGameClickListener {
-        void onGameClick(GamesResponse.Game game);
+    public interface OnGameTypeClickListener {
+        void onGameTypeClick(GameType gameType);
     }
 
-    public GameTypeAdapter(Context context, List<GamesResponse.Game> games, OnGameClickListener listener) {
+    private final Context context;
+    private final List<GameType> list;
+    private final OnGameTypeClickListener listener;
+
+    public GameTypeAdapter(Context context,
+                           List<GameType> list,
+                           OnGameTypeClickListener listener) {
         this.context = context;
-        this.games = games;
+        this.list = list;
         this.listener = listener;
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_game_type, parent, false);
-        return new ViewHolder(view);
+    public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(context)
+                .inflate(R.layout.item_game_type, parent, false);
+        return new Holder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        GamesResponse.Game game = games.get(position);
+    public void onBindViewHolder(@NonNull Holder h, int position) {
+        GameType gameType = list.get(position);
 
-        holder.txtGameName.setText(game.getName());
+        h.txtGameType.setText(gameType.getName());
 
         Glide.with(context)
-                .load(game.getImage())
+                .load(gameType.getImage())
                 .placeholder(R.drawable.ic_placeholder)
-                .error(R.drawable.ic_placeholder)
-                .into(holder.imgGame);
+                .into(h.imgGameType);
 
-        holder.cardView.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onGameClick(game);
-            }
-        });
+        h.itemView.setOnClickListener(v ->
+                listener.onGameTypeClick(gameType));
     }
 
     @Override
     public int getItemCount() {
-        return games.size();
+        return list == null ? 0 : list.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
-        MaterialCardView cardView;
-        ImageView imgGame;
-        TextView txtGameName;
+    static class Holder extends RecyclerView.ViewHolder {
 
-        ViewHolder(View itemView) {
+        TextView txtGameType;
+        ImageView imgGameType;
+
+        Holder(@NonNull View itemView) {
             super(itemView);
-            cardView = itemView.findViewById(R.id.cardGameType);
-            imgGame = itemView.findViewById(R.id.imgGameType);
-            txtGameName = itemView.findViewById(R.id.txtGameTypeName);
+            txtGameType = itemView.findViewById(R.id.txtGameTypeName);
+            imgGameType = itemView.findViewById(R.id.imgGameType);
         }
     }
 }

@@ -17,13 +17,15 @@
         android:theme="@style/Theme.GameApp"
         android:usesCleartextTraffic="false">
         <activity
-            android:name=".activities.BidActivity"
-            android:windowSoftInputMode="adjustPan"
+            android:name=".activities.StarlineActivity"
             android:exported="false" />
+        <activity
+            android:name=".activities.BidActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activities.GameTypesActivity"
             android:exported="false" />
-
         <activity
             android:name=".activities.ResetPasswordActivity"
             android:exported="false" />
@@ -33,8 +35,6 @@
         <activity
             android:name=".activities.ChangePasswordActivity"
             android:exported="false" />
-
-
         <activity
             android:name=".activities.SupportActivity"
             android:exported="false" />

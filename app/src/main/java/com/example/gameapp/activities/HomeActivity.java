@@ -23,11 +23,9 @@ import com.example.gameapp.models.response.TapsResponse;
 import com.example.gameapp.models.response.UserDetailsResponse;
 import com.example.gameapp.session.SessionManager;
 import com.google.android.material.navigation.NavigationView;
-import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import retrofit2.Call;
@@ -42,8 +40,7 @@ public class HomeActivity extends AppCompatActivity {
     private RecyclerView rvGameTaps;
     private long lastBackPressedTime = 0;
 
-    // ✅ NEW – Drawer header views
-    private TextView txtPlayerName, txtPlayerMobile,txtViewProfile;
+    private TextView txtPlayerName, txtPlayerMobile, txtViewProfile;
 
     private static final String TAG = "HomeActivity";
 
@@ -60,7 +57,7 @@ public class HomeActivity extends AppCompatActivity {
         setupDrawer();
         setupActionButtons();
 
-        loadUserDetails();   // ✅ NEW
+        loadUserDetails();
         loadGameTaps();
     }
 
@@ -70,7 +67,6 @@ public class HomeActivity extends AppCompatActivity {
         btnMenu = findViewById(R.id.btnMenu);
         rvGameTaps = findViewById(R.id.rvGameTaps);
 
-        // ✅ INIT HEADER VIEWS
         View headerView = navigationView.getHeaderView(0);
         txtPlayerName = headerView.findViewById(R.id.txtPlayerName);
         txtPlayerMobile = headerView.findViewById(R.id.txtPlayerMobile);
@@ -98,8 +94,9 @@ public class HomeActivity extends AppCompatActivity {
                 toast("Opening WhatsApp...")
         );
 
+        // ✅ UPDATED: Navigate to StarlineActivity
         findViewById(R.id.btnStarline).setOnClickListener(v ->
-                toast("Opening Starline...")
+                startActivity(new Intent(this, StarlineActivity.class))
         );
 
         findViewById(R.id.btnAddPoints).setOnClickListener(v ->
@@ -160,11 +157,7 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
-    // =====================================================
-    // ✅ USER DETAILS API (REUSED MODEL)
-    // =====================================================
     private void loadUserDetails() {
-
         ApiClient.getClient()
                 .create(ApiService.class)
                 .getUserDetails(
@@ -186,14 +179,11 @@ public class HomeActivity extends AppCompatActivity {
                             txtPlayerName.setText(user.name);
                             txtPlayerMobile.setText(user.mobileNo);
 
-                            // ✅ Save balance globally
                             SessionManager.saveBalance(
                                     HomeActivity.this,
                                     user.balance
                             );
-                            //save email
                             SessionManager.saveEmail(HomeActivity.this, user.email);
-
 
                             Log.d(TAG, "User loaded: " + user.name);
                         }
@@ -206,9 +196,6 @@ public class HomeActivity extends AppCompatActivity {
                 });
     }
 
-    // =====================================================
-    // GAME TAPS (UNCHANGED)
-    // =====================================================
     private void loadGameTaps() {
         ApiClient.getClient()
                 .create(ApiService.class)
@@ -219,16 +206,22 @@ public class HomeActivity extends AppCompatActivity {
                     public void onResponse(Call<TapsResponse> call,
                                            Response<TapsResponse> response) {
 
-                        if (response.isSuccessful() && response.body() != null) {
+                        if (!response.isSuccessful()
+                                || response.body() == null
+                                || response.body().getData() == null) {
+                            return;
+                        }
 
-                            gameItems.clear();
+                        gameItems.clear();
 
-                            for (TapsResponse.GameData game : response.body().getData()) {
+                        for (TapsResponse.GameData game : response.body().getData()) {
 
-                                TapsResponse.Tap openTap = null;
-                                TapsResponse.Tap closeTap = null;
+                            TapsResponse.Tap openTap = null;
+                            TapsResponse.Tap closeTap = null;
 
+                            if (game.getTimes() != null) {
                                 for (TapsResponse.Tap tap : game.getTimes()) {
+
                                     tap.setGameName(game.getName());
 
                                     if ("open".equalsIgnoreCase(tap.getType())) {
@@ -237,15 +230,19 @@ public class HomeActivity extends AppCompatActivity {
                                         closeTap = tap;
                                     }
                                 }
-
-                                gameItems.add(
-                                        new GameItem(game.getName(), openTap, closeTap)
-                                );
                             }
 
-                            sortGamesByStatus();
-                            gameTapAdapter.notifyDataSetChanged();
+                            gameItems.add(
+                                    new GameItem(
+                                            game.getName(),
+                                            openTap,
+                                            closeTap
+                                    )
+                            );
                         }
+
+                        sortGamesByStatus();
+                        gameTapAdapter.notifyDataSetChanged();
                     }
 
                     @Override
@@ -263,19 +260,10 @@ public class HomeActivity extends AppCompatActivity {
 
     private int getGamePriority(GameItem item) {
         String o = item.hasOpenTap() ? item.getOpenTap().getStatus() : null;
-        String c = item.hasCloseTap() ? item.getCloseTap().getStatus() : null;
 
-        if (isRunning(o) || isRunning(c)) return 1;
-        if (isOpenOrUpcoming(o) || isOpenOrUpcoming(c)) return 2;
+        if ("open".equalsIgnoreCase(o)) return 1;
+        if ("upcoming".equalsIgnoreCase(o)) return 2;
         return 3;
-    }
-
-    private boolean isRunning(String s) {
-        return s != null && s.equalsIgnoreCase("running");
-    }
-
-    private boolean isOpenOrUpcoming(String s) {
-        return s != null && (s.equalsIgnoreCase("open") || s.equalsIgnoreCase("upcoming"));
     }
 
     private void openGameSelection(TapsResponse.Tap tap, String type) {
@@ -299,11 +287,14 @@ public class HomeActivity extends AppCompatActivity {
     private void toast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
+
     @Override
     public void onBackPressed() {
         long currentTime = System.currentTimeMillis();
+
         if (currentTime - lastBackPressedTime < 2000) {
-            finish();
+            finishAffinity();
+            System.exit(0);
         } else {
             lastBackPressedTime = currentTime;
             Toast.makeText(this, "Press back again to exit", Toast.LENGTH_SHORT).show();

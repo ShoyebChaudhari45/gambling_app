@@ -2,10 +2,25 @@ package com.example.gameapp.models.response;
 
 import com.google.gson.annotations.SerializedName;
 import java.util.List;
+
 public class TapsResponse {
+
+    @SerializedName("status_code")
+    private int statusCode;
+
+    @SerializedName("message")
+    private String message;
 
     @SerializedName("data")
     private List<GameData> data;
+
+    public int getStatusCode() {
+        return statusCode;
+    }
+
+    public String getMessage() {
+        return message;
+    }
 
     public List<GameData> getData() {
         return data;
@@ -18,7 +33,7 @@ public class TapsResponse {
         private int id;
 
         @SerializedName("name")
-        private String name; // ✅ GAME NAME
+        private String name;
 
         @SerializedName("times")
         private List<Tap> times;
@@ -42,8 +57,8 @@ public class TapsResponse {
         @SerializedName("id")
         private int id;
 
-        @SerializedName("type")
-        private String type;
+        @SerializedName("start_time")
+        private String startTime;
 
         @SerializedName("end_time")
         private String endTime;
@@ -51,15 +66,40 @@ public class TapsResponse {
         @SerializedName("status")
         private String status;
 
-        // runtime only (not from API)
+        // Runtime fields
         private String gameName;
+        private String type;
 
-        public int getId() { return id; }
-        public String getType() { return type; }
-        public String getEndTime() { return endTime; }
-        public String getStatus() { return status; }
+        public int getId() {
+            return id;
+        }
 
-        public String getGameName() { return gameName; }
-        public void setGameName(String gameName) { this.gameName = gameName; }
+        public String getStartTime() {
+            return startTime;
+        }
+
+        public String getEndTime() {
+            return endTime;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public String getGameName() {
+            return gameName;
+        }
+
+        public void setGameName(String gameName) {
+            this.gameName = gameName;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
     }
 }

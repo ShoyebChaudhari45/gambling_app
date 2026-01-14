@@ -180,13 +180,40 @@
                 app:endIconMode="password_toggle"
                 app:endIconTint="@color/colorPrimary"
                 app:errorEnabled="true"
-                app:helperText="Min 6 chars, 1 upper, 1 lower, 1 number , 1 special char">
+                app:helperText="Min 4 chars.">
 
-            <com.google.android.material.textfield.TextInputEditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edtPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
+                    android:textSize="16sp"
+                    android:textColor="@color/textPrimary"
+                    android:paddingVertical="16dp"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- REFERRAL CODE (OPTIONAL) -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:hint="Referral Code (Optional)"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxStrokeWidth="2dp"
+                app:boxStrokeColor="@color/input_stroke_color"
+                app:hintTextColor="@color/colorPrimary"
+                app:startIconDrawable="@drawable/ic_gift"
+                app:startIconTint="@color/colorPrimary">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edtReferralCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapCharacters"
                     android:textSize="16sp"
                     android:textColor="@color/textPrimary"
                     android:paddingVertical="16dp"/>

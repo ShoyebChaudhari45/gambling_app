@@ -4,66 +4,187 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageButton;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.gameapp.R;
+import com.example.gameapp.api.ApiClient;
+import com.example.gameapp.api.ApiService;
+import com.example.gameapp.models.response.SupportResponse;
+import com.example.gameapp.session.SessionManager;
+import com.google.android.material.card.MaterialCardView;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SupportActivity extends AppCompatActivity {
-    private long lastBackPressedTime = 0;
+
+    private MaterialCardView rowCall, rowWhatsapp, rowEmail, rowTelegram, rowProof;
+    private TextView txtCallNumber, txtWhatsappNumber, txtEmail, txtNoData;
+    private ProgressBar progressBar;
+
+    private SupportResponse.SupportData supportData;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_support);
-        ImageButton btnBack=findViewById(R.id.btnBack);
 
-        btnBack.setOnClickListener(v -> {
-            Intent intent = new Intent(SupportActivity.this, HomeActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            startActivity(intent);
-            finish();
-        });
-
-
-
-        setupSupportRows();
+        initViews();
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+        fetchSupportData();
     }
 
-    private void setupSupportRows() {
+    private void initViews() {
+        rowCall = findViewById(R.id.rowCall);
+        rowWhatsapp = findViewById(R.id.rowWhatsapp);
+        rowEmail = findViewById(R.id.rowEmail);
+        rowTelegram = findViewById(R.id.rowTelegram);
+        rowProof = findViewById(R.id.rowProof);
 
-        findViewById(R.id.rowCall).setOnClickListener(v ->
-                Toast.makeText(this, "Call clicked", Toast.LENGTH_SHORT).show()
-        );
+        txtCallNumber = findViewById(R.id.txtCallNumber);
+        txtWhatsappNumber = findViewById(R.id.txtWhatsappNumber);
+        txtEmail = findViewById(R.id.txtEmail);
+        txtNoData = findViewById(R.id.txtNoData);
 
-        findViewById(R.id.rowWhatsapp).setOnClickListener(v ->
-                startActivity(new Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse("https://wa.me/919000000000")
-                ))
-        );
-
-        findViewById(R.id.rowEmail).setOnClickListener(v ->
-                startActivity(new Intent(
-                        Intent.ACTION_SENDTO,
-                        Uri.parse("mailto:support@example.com")
-                ))
-        );
-
-
-        findViewById(R.id.rowProof).setOnClickListener(v ->
-                Toast.makeText(this, "Withdraw Proof clicked", Toast.LENGTH_SHORT).show()
-        );
+        progressBar = findViewById(R.id.progressBar);
     }
-    @Override
-    public void onBackPressed() {
-        long currentTime = System.currentTimeMillis();
-        if (currentTime - lastBackPressedTime < 2000) {
-            finish();
-        } else {
-            lastBackPressedTime = currentTime;
-            Toast.makeText(this, "Press back again to exit", Toast.LENGTH_SHORT).show();
+
+    private void fetchSupportData() {
+        progressBar.setVisibility(View.VISIBLE);
+        hideAllRows();
+
+        String token = "Bearer " + SessionManager.getToken(this);
+
+        ApiClient.getClient()
+                .create(ApiService.class)
+                .getSupport(token)
+                .enqueue(new Callback<SupportResponse>() {
+
+                    @Override
+                    public void onResponse(Call<SupportResponse> call,
+                                           Response<SupportResponse> response) {
+
+                        progressBar.setVisibility(View.GONE);
+
+                        if (response.isSuccessful()
+                                && response.body() != null
+                                && response.body().isStatus()
+                                && response.body().getData() != null) {
+
+                            supportData = response.body().getData();
+                            displaySupportOptions();
+
+                        } else {
+                            showNoDataMessage();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<SupportResponse> call, Throwable t) {
+                        progressBar.setVisibility(View.GONE);
+                        Toast.makeText(SupportActivity.this,
+                                "Failed to load support details",
+                                Toast.LENGTH_SHORT).show();
+                        showNoDataMessage();
+                    }
+                });
+    }
+
+    // ================= DYNAMIC UI =================
+
+    private void displaySupportOptions() {
+
+        boolean hasAnyData = false;
+
+        if (supportData.hasValidContact()) {
+            rowCall.setVisibility(View.VISIBLE);
+            txtCallNumber.setText(supportData.getContactNo());
+            rowCall.setOnClickListener(v ->
+                    dialNumber(supportData.getContactNo()));
+            hasAnyData = true;
+        }
+
+        if (supportData.hasValidWhatsapp()) {
+            rowWhatsapp.setVisibility(View.VISIBLE);
+            txtWhatsappNumber.setText(supportData.getWhatsappNo());
+            rowWhatsapp.setOnClickListener(v ->
+                    openWhatsApp(supportData.getWhatsappNo()));
+            hasAnyData = true;
+        }
+
+        if (supportData.hasValidEmail()) {
+            rowEmail.setVisibility(View.VISIBLE);
+            txtEmail.setText(supportData.getEmailId());
+            rowEmail.setOnClickListener(v ->
+                    sendEmail(supportData.getEmailId()));
+            hasAnyData = true;
+        }
+
+        if (supportData.hasValidTelegram()) {
+            rowTelegram.setVisibility(View.VISIBLE);
+            rowTelegram.setOnClickListener(v ->
+                    openLink(supportData.getTelegramLink()));
+            hasAnyData = true;
+        }
+
+        if (supportData.hasValidProof()) {
+            rowProof.setVisibility(View.VISIBLE);
+            rowProof.setOnClickListener(v ->
+                    openLink(supportData.getProofLink()));
+            hasAnyData = true;
+        }
+
+        if (!hasAnyData) {
+            showNoDataMessage();
+        }
+    }
+
+    private void hideAllRows() {
+        rowCall.setVisibility(View.GONE);
+        rowWhatsapp.setVisibility(View.GONE);
+        rowEmail.setVisibility(View.GONE);
+        rowTelegram.setVisibility(View.GONE);
+        rowProof.setVisibility(View.GONE);
+        txtNoData.setVisibility(View.GONE);
+    }
+
+    private void showNoDataMessage() {
+        hideAllRows();
+        txtNoData.setVisibility(View.VISIBLE);
+    }
+
+    // ================= ACTIONS =================
+
+    private void dialNumber(String number) {
+        startActivity(new Intent(Intent.ACTION_DIAL,
+                Uri.parse("tel:" + number)));
+    }
+
+    private void openWhatsApp(String number) {
+        String clean = number.replaceAll("[^0-9]", "");
+        String url = "https://wa.me/" + clean;
+        openLink(url);
+    }
+
+    private void sendEmail(String email) {
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:" + email));
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Support Request");
+        startActivity(intent);
+    }
+
+    private void openLink(String link) {
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
+        } catch (Exception e) {
+            Toast.makeText(this,
+                    "Invalid link",
+                    Toast.LENGTH_SHORT).show();
         }
     }
 }

@@ -33,22 +33,20 @@
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardBack"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="8dp"
-            app:cardCornerRadius="12dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            app:cardCornerRadius="10dp"
             app:cardElevation="0dp"
-            app:cardBackgroundColor="#30FFFFFF"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:cardBackgroundColor="#30FFFFFF">
 
             <ImageButton
                 android:id="@+id/btnBack"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="10dp"
+                android:padding="8dp"
                 android:src="@drawable/ic_back"
                 app:tint="@color/dark_blue" />
         </com.google.android.material.card.MaterialCardView>
@@ -165,11 +163,10 @@
                             app:cardElevation="4dp"
                             app:cardBackgroundColor="@color/dark_blue"
                             app:strokeWidth="0dp">
-
                             <RadioButton
                                 android:id="@+id/btnOpen"
                                 android:layout_width="wrap_content"
-                                android:layout_height="40dp"
+                                android:layout_height="38dp"
                                 android:text="Open"
                                 android:textColor="@android:color/white"
                                 android:textStyle="bold"
@@ -177,10 +174,12 @@
                                 android:gravity="center_vertical"
                                 android:checked="true"
                                 android:button="@drawable/ic_radio_white"
-                                android:paddingStart="16dp"
-                                android:paddingEnd="18dp"
+                                android:paddingStart="10dp"
+                                android:paddingEnd="12dp"
                                 android:drawablePadding="6dp"
+                                android:minWidth="0dp"
                                 android:background="@android:color/transparent"/>
+
 
                         </com.google.android.material.card.MaterialCardView>
 
@@ -199,17 +198,19 @@
                             <RadioButton
                                 android:id="@+id/btnClose"
                                 android:layout_width="wrap_content"
-                                android:layout_height="40dp"
+                                android:layout_height="38dp"
                                 android:text="Close"
                                 android:textColor="#607D8B"
                                 android:textStyle="bold"
                                 android:textSize="13sp"
                                 android:gravity="center_vertical"
                                 android:button="@drawable/ic_radio_white"
-                                android:paddingStart="16dp"
-                                android:paddingEnd="18dp"
+                                android:paddingStart="10dp"
+                                android:paddingEnd="12dp"
                                 android:drawablePadding="6dp"
+                                android:minWidth="0dp"
                                 android:background="@android:color/transparent"/>
+
 
                         </com.google.android.material.card.MaterialCardView>
 

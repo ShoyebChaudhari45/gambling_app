@@ -1,5 +1,7 @@
 package com.example.gameapp.activities;
 
+import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -8,6 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.widget.CompoundButtonCompat;
 
 import com.example.gameapp.R;
 import com.example.gameapp.session.SessionManager;
@@ -30,7 +33,6 @@ public class BidActivity extends AppCompatActivity {
 
     private String gameName, gameType, tapType;
     private boolean isOpenSelected = true;
-    private long lastBackPressedTime = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,9 +78,8 @@ public class BidActivity extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
-        btnBack.setOnClickListener(v -> finish());
+        btnBack.setOnClickListener(v -> onBackPressed());
 
-        // Card par click karne se bhi select ho
         cardOpen.setOnClickListener(v -> {
             isOpenSelected = true;
             updateOpenCloseSelection(true);
@@ -101,7 +102,7 @@ public class BidActivity extends AppCompatActivity {
             updateOpenCloseSelection(false);
         });
 
-        btnProceed.setOnClickListener(v -> validateAndProceed());
+        btnProceed.setOnClickListener(v -> proceedWithBid());
     }
 
     private void updateOpenCloseSelection(boolean isOpen) {
@@ -117,9 +118,15 @@ public class BidActivity extends AppCompatActivity {
             cardClose.setStrokeWidth(2);
             cardClose.setStrokeColor(0xFFB0BEC5);
 
-            // Text colors
+            // Text colors - WHITE when selected
             btnOpen.setTextColor(getColor(android.R.color.white));
             btnClose.setTextColor(0xFF607D8B);
+
+            // Radio button tint - WHITE when selected
+            CompoundButtonCompat.setButtonTintList(btnOpen,
+                    ColorStateList.valueOf(getColor(android.R.color.white)));
+            CompoundButtonCompat.setButtonTintList(btnClose,
+                    ColorStateList.valueOf(0xFF9E9E9E));
 
             // Check states
             btnOpen.setChecked(true);
@@ -136,9 +143,15 @@ public class BidActivity extends AppCompatActivity {
             cardOpen.setStrokeWidth(2);
             cardOpen.setStrokeColor(0xFFB0BEC5);
 
-            // Text colors
+            // Text colors - WHITE when selected
             btnClose.setTextColor(getColor(android.R.color.white));
             btnOpen.setTextColor(0xFF607D8B);
+
+            // Radio button tint - WHITE when selected
+            CompoundButtonCompat.setButtonTintList(btnClose,
+                    ColorStateList.valueOf(getColor(android.R.color.white)));
+            CompoundButtonCompat.setButtonTintList(btnOpen,
+                    ColorStateList.valueOf(0xFF9E9E9E));
 
             // Check states
             btnOpen.setChecked(false);
@@ -152,39 +165,16 @@ public class BidActivity extends AppCompatActivity {
         return sdf.format(calendar.getTime());
     }
 
-    private void validateAndProceed() {
+    private void proceedWithBid() {
         String digits = etDigits.getText().toString().trim();
         String points = etPoints.getText().toString().trim();
-
-        if (digits.isEmpty()) {
-            toast("Please enter digits");
-            etDigits.requestFocus();
-            return;
-        }
-
-        if (points.isEmpty()) {
-            toast("Please enter points");
-            etPoints.requestFocus();
-            return;
-        }
-
-        int pointsValue = Integer.parseInt(points);
-        if (pointsValue <= 0) {
-            toast("Points must be greater than 0");
-            return;
-        }
-
-        int balance = Integer.parseInt(txtBalance.getText().toString());
-        if (pointsValue > balance) {
-            toast("Insufficient balance");
-            return;
-        }
-
         String bidType = isOpenSelected ? "Open" : "Close";
-        submitBid(digits, pointsValue, bidType);
+
+        // No validations - just proceed
+        submitBid(digits, points, bidType);
     }
 
-    private void submitBid(String digits, int points, String bidType) {
+    private void submitBid(String digits, String points, String bidType) {
         toast("Bid placed: " + digits + " - " + points + " pts (" + bidType + ")");
         // TODO API call
     }
@@ -192,14 +182,10 @@ public class BidActivity extends AppCompatActivity {
     private void toast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
+
     @Override
     public void onBackPressed() {
-        long currentTime = System.currentTimeMillis();
-        if (currentTime - lastBackPressedTime < 2000) {
-            finish();
-        } else {
-            lastBackPressedTime = currentTime;
-            Toast.makeText(this, "Press back again to exit", Toast.LENGTH_SHORT).show();
-        }
+        super.onBackPressed();
+        finish();
     }
 }

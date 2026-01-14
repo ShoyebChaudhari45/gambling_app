@@ -30,19 +30,20 @@ import android.text.InputType;
 public class RegisterActivity extends AppCompatActivity {
 
     private long lastBackPressedTime = 0;
+    private boolean doubleBackToExitPressedOnce = false;
     private static final String TAG = "REGISTER_API";
 
-    private EditText edtName, edtMobile, edtEmail, edtPassword;
+    private EditText edtName, edtMobile, edtEmail, edtPassword, edtReferralCode;
     private RadioGroup rgUserType;
     private MaterialButton btnSignup;
     private TextView txtLogin;
     private View progressContainer;
 
-    private TextInputLayout tilName, tilMobile, tilEmail, tilPassword;
+    private TextInputLayout tilName, tilMobile, tilEmail, tilPassword, tilReferralCode;
 
     // 🔐 Password rule
-    private static final Pattern PASSWORD_PATTERN =
-            Pattern.compile("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&+=!]).{6,}$");
+    // 🔐 Password rule (minimum 4 characters, anything allowed)
+    private static final int MIN_PASSWORD_LENGTH = 4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +54,7 @@ public class RegisterActivity extends AppCompatActivity {
         edtMobile = findViewById(R.id.edtMobile);
         edtEmail = findViewById(R.id.edtEmail);
         edtPassword = findViewById(R.id.edtPassword);
+        edtReferralCode = findViewById(R.id.edtReferralCode);
         rgUserType = findViewById(R.id.rgUserType);
         btnSignup = findViewById(R.id.btnSignup);
         txtLogin = findViewById(R.id.txtLogin);
@@ -63,6 +65,7 @@ public class RegisterActivity extends AppCompatActivity {
         tilMobile = (TextInputLayout) edtMobile.getParent().getParent();
         tilEmail = (TextInputLayout) edtEmail.getParent().getParent();
         tilPassword = findViewById(R.id.tilPassword);
+        tilReferralCode = (TextInputLayout) edtReferralCode.getParent().getParent();
 
         btnSignup.setOnClickListener(v -> registerUser());
 
@@ -80,6 +83,7 @@ public class RegisterActivity extends AppCompatActivity {
         String mobile = edtMobile.getText().toString().trim();
         String email = edtEmail.getText().toString().trim();
         String password = edtPassword.getText().toString().trim();
+        String referralCode = edtReferralCode.getText().toString().trim();
 
         // 👤 Name
         if (name.isEmpty()) {
@@ -102,22 +106,18 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        // 🔐 Password
         // 🔐 Password validation with AUTO VISIBILITY
-        if (!PASSWORD_PATTERN.matcher(password).matches()) {
+        // 🔐 Password validation (MIN 4, ANYTHING ALLOWED)
+        if (password.length() < MIN_PASSWORD_LENGTH) {
 
-            // 👁 Password visible when error
+            // 👁 Show password on error
             edtPassword.setInputType(
                     InputType.TYPE_CLASS_TEXT |
                             InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
             );
             edtPassword.setSelection(edtPassword.length());
 
-            // 🔴 SET REAL ERROR
-            tilPassword.setError(
-                    "Must contain uppercase, lowercase, number & special character"
-            );
-
+            tilPassword.setError("Password must be at least 4 characters");
             edtPassword.requestFocus();
             return;
 
@@ -130,11 +130,8 @@ public class RegisterActivity extends AppCompatActivity {
             );
             edtPassword.setSelection(edtPassword.length());
 
-            // ✅ Clear error
             tilPassword.setError(null);
         }
-
-
 
         // 👥 User type
         if (rgUserType.getCheckedRadioButtonId() == -1) {
@@ -150,6 +147,11 @@ public class RegisterActivity extends AppCompatActivity {
         request.email = email;
         request.password = password;
         request.status = "active";
+
+        // 🎁 Add referral code if provided
+        if (!referralCode.isEmpty()) {
+            request.referral_code = referralCode;
+        }
 
         int selectedId = rgUserType.getCheckedRadioButtonId();
         request.user_type = (selectedId == R.id.rbEmployee) ? "employee" : "customer";
@@ -188,6 +190,7 @@ public class RegisterActivity extends AppCompatActivity {
         tilMobile.setError(null);
         tilEmail.setError(null);
         tilPassword.setError(null);
+        tilReferralCode.setError(null);
     }
 
     private void showLoader(boolean show) {
@@ -198,14 +201,29 @@ public class RegisterActivity extends AppCompatActivity {
     private void toast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
     }
+
+    // 🔙 Double back press to exit
+
+
     @Override
     public void onBackPressed() {
-        long currentTime = System.currentTimeMillis();
-        if (currentTime - lastBackPressedTime < 2000) {
-            finish();
-        } else {
-            lastBackPressedTime = currentTime;
-            Toast.makeText(this, "Press back again to exit", Toast.LENGTH_SHORT).show();
+
+        if (doubleBackToExitPressedOnce) {
+            finishAffinity();
+            System.exit(0);
+            return;
         }
+
+        // First back press → go to Login
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        finish();
+
+        doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, "Press back again to exit", Toast.LENGTH_SHORT).show();
+
+        new android.os.Handler().postDelayed(() ->
+                doubleBackToExitPressedOnce = false, 2000);
     }
 }

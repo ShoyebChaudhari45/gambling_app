@@ -15,6 +15,7 @@ import com.example.gameapp.Adapters.GameTypeAdapter;
 import com.example.gameapp.R;
 import com.example.gameapp.api.ApiClient;
 import com.example.gameapp.api.ApiService;
+import com.example.gameapp.models.GameType;
 import com.example.gameapp.models.response.GamesResponse;
 import com.example.gameapp.session.SessionManager;
 
@@ -28,20 +29,15 @@ import retrofit2.Response;
 public class GameTypesActivity extends AppCompatActivity {
 
     private static final String TAG = "GameTypesActivity";
-    private long lastBackPressedTime = 0;
 
     private RecyclerView rvGameTypes;
     private TextView txtTitle;
     private ImageButton btnBack;
 
-    private final List<GamesResponse.Game> gameTypes = new ArrayList<>();
-    private GameTypeAdapter gameTypeAdapter;
+    private final List<GameType> gameTypes = new ArrayList<>();
+    private GameTypeAdapter adapter;
 
-    private String tapId;
-    private String tapType;
-    private String gameName;
-    private String endTime;
-    private String status;
+    private String tapId, tapType, gameName, endTime, status;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,9 +56,6 @@ public class GameTypesActivity extends AppCompatActivity {
         gameName = getIntent().getStringExtra("game_name");
         endTime = getIntent().getStringExtra("end_time");
         status = getIntent().getStringExtra("status");
-
-        Log.d(TAG, "Intent data: tapId=" + tapId + ", tapType=" + tapType
-                + ", gameName=" + gameName + ", status=" + status);
     }
 
     private void initViews() {
@@ -71,16 +64,13 @@ public class GameTypesActivity extends AppCompatActivity {
         btnBack = findViewById(R.id.btnBack);
 
         txtTitle.setText(gameName + " - " + tapType);
-
         btnBack.setOnClickListener(v -> finish());
     }
 
     private void setupRecyclerView() {
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
-        rvGameTypes.setLayoutManager(gridLayoutManager);
-
-        gameTypeAdapter = new GameTypeAdapter(this, gameTypes, this::onGameTypeClick);
-        rvGameTypes.setAdapter(gameTypeAdapter);
+        rvGameTypes.setLayoutManager(new GridLayoutManager(this, 2));
+        adapter = new GameTypeAdapter(this, gameTypes, this::onGameTypeClick);
+        rvGameTypes.setAdapter(adapter);
     }
 
     private void loadGameTypes() {
@@ -88,37 +78,39 @@ public class GameTypesActivity extends AppCompatActivity {
                 .create(ApiService.class)
                 .getGames("Bearer " + SessionManager.getToken(this))
                 .enqueue(new Callback<GamesResponse>() {
+
                     @Override
-                    public void onResponse(Call<GamesResponse> call, Response<GamesResponse> response) {
-                        if (response.isSuccessful() && response.body() != null) {
-                            Log.d(TAG, "Games loaded: " + response.body().getData().size());
+                    public void onResponse(Call<GamesResponse> call,
+                                           Response<GamesResponse> response) {
+
+                        if (response.isSuccessful()
+                                && response.body() != null
+                                && response.body().getData() != null) {
 
                             gameTypes.clear();
                             gameTypes.addAll(response.body().getData());
-                            gameTypeAdapter.notifyDataSetChanged();
+                            adapter.notifyDataSetChanged();
+
                         } else {
-                            Log.e(TAG, "Failed to load games: " + response.message());
                             toast("Failed to load game types");
                         }
                     }
 
                     @Override
                     public void onFailure(Call<GamesResponse> call, Throwable t) {
-                        Log.e(TAG, "Error loading games", t);
-                        toast("Network error");
+                        Log.e(TAG, "API Error", t);
+                        toast(t.getMessage());
                     }
                 });
     }
 
-    private void onGameTypeClick(GamesResponse.Game game) {
-        Log.d(TAG, "Game type clicked: " + game.getName());
+    private void onGameTypeClick(GameType gameType) {
 
         Intent intent = new Intent(this, BidActivity.class);
         intent.putExtra("tap_id", tapId);
         intent.putExtra("tap_type", tapType);
         intent.putExtra("game_name", gameName);
-        intent.putExtra("game_type", game.getName());
-        intent.putExtra("game_image", game.getImage());
+        intent.putExtra("game_type", gameType.getName());
         intent.putExtra("end_time", endTime);
         intent.putExtra("status", status);
         startActivity(intent);
@@ -126,15 +118,5 @@ public class GameTypesActivity extends AppCompatActivity {
 
     private void toast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-    }
-    @Override
-    public void onBackPressed() {
-        long currentTime = System.currentTimeMillis();
-        if (currentTime - lastBackPressedTime < 2000) {
-            finish();
-        } else {
-            lastBackPressedTime = currentTime;
-            Toast.makeText(this, "Press back again to exit", Toast.LENGTH_SHORT).show();
-        }
     }
 }

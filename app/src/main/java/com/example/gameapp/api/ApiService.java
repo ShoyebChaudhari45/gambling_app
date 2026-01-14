@@ -12,11 +12,15 @@ import com.example.gameapp.models.request.WithdrawRequest;
 import com.example.gameapp.models.response.ChangePasswordResponse;
 import com.example.gameapp.models.response.CommonResponse;
 import com.example.gameapp.models.response.DepositResponse;
+import com.example.gameapp.models.response.GameRateResponse;
 import com.example.gameapp.models.response.GamesResponse;
 import com.example.gameapp.models.response.GenericResponse;
 import com.example.gameapp.models.response.LoginResponse;
 import com.example.gameapp.models.response.PriceResponse;
 import com.example.gameapp.models.response.RegisterResponse;
+import com.example.gameapp.models.response.StarlineRatesResponse;
+import com.example.gameapp.models.response.StarlineTimesResponse;
+import com.example.gameapp.models.response.SupportResponse;
 import com.example.gameapp.models.response.TapsResponse;
 import com.example.gameapp.models.response.UserDetailsResponse;
 import com.example.gameapp.models.response.WalletStatementResponse;
@@ -84,7 +88,10 @@ public interface ApiService {
 
 
     @GET("games")
-    Call<GamesResponse> getGames(@Header("Authorization") String authorization);
+    Call<GamesResponse> getGames(
+            @Header("Authorization") String authorization
+    );
+
 
 
     @GET("taps")
@@ -120,8 +127,25 @@ public interface ApiService {
     Call<WalletStatementResponse> getWalletStatement(
             @Header("Authorization") String token
     );
+    @GET("support")
+    Call<SupportResponse> getSupport(@Header("Authorization") String authorization);
 
+    @GET("starline_rate")
+    Call<StarlineRatesResponse> getStarlineRates(
+            @Header("Authorization") String token,
+            @Header("Accept") String accept
+    );
 
+    @GET("starline_times")
+    Call<StarlineTimesResponse> getStarlineTimes(
+            @Header("Authorization") String token,
+            @Header("Accept") String accept
+    );
+
+    @GET("gamerate")
+    Call<GameRateResponse> getGameRates(
+            @Header("Authorization") String token
+    );
 
 }
 //46|Q3mgxI7zB62rDYzmpZrxmlp8Achw43lyDL0TEpPda`c7a5f73

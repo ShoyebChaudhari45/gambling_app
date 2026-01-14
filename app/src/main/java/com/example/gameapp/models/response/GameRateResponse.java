@@ -1,10 +1,9 @@
 package com.example.gameapp.models.response;
 
-import com.example.gameapp.models.GameType;
 import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
-public class GamesResponse {
+public class GameRateResponse {
 
     @SerializedName("status_code")
     private int statusCode;
@@ -13,17 +12,9 @@ public class GamesResponse {
     private String message;
 
     @SerializedName("data")
-    private List<GameType> data;
+    private List<GameRateItem> data;
 
-    public int getStatusCode() {
-        return statusCode;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public List<GameType> getData() {
+    public List<GameRateItem> getData() {
         return data;
     }
 }
