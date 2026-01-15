@@ -18,7 +18,6 @@ import com.example.gameapp.api.ApiService;
 import com.example.gameapp.models.GameRateModel;
 import com.example.gameapp.models.response.GameRateItem;
 import com.example.gameapp.models.response.GameRateResponse;
-import com.example.gameapp.models.response.PriceResponse;
 import com.example.gameapp.session.SessionManager;
 
 import java.util.ArrayList;
@@ -32,10 +31,12 @@ public class GameRatesActivity extends AppCompatActivity {
 
     private RecyclerView rv;
     private long lastBackPressedTime = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_rates);
+
         ImageButton btnBack = findViewById(R.id.btnBack);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -43,7 +44,6 @@ public class GameRatesActivity extends AppCompatActivity {
 
         rv = findViewById(R.id.rvRates);
         rv.setLayoutManager(new LinearLayoutManager(this));
-
 
         btnBack.setOnClickListener(v -> {
             Intent intent = new Intent(GameRatesActivity.this, HomeActivity.class);
@@ -56,7 +56,6 @@ public class GameRatesActivity extends AppCompatActivity {
     }
 
     private void loadRates() {
-
         String token = "Bearer " + SessionManager.getToken(this);
 
         ApiClient.getClient()
@@ -82,13 +81,13 @@ public class GameRatesActivity extends AppCompatActivity {
 
                         for (GameRateItem item : response.body().getData()) {
 
-                            String name = item.getGame();
-                            String rate = item.getDigit();
+                            // Use the game name directly from backend
+                            String name = item.getGame() != null ? item.getGame() : "Unknown";
 
-                            // fallback if digit missing
-                            if (rate == null || rate.isEmpty()) {
-                                rate = "-";
-                            }
+                            // Create rate format: "price-digit" (e.g., "10-95")
+                            String price = item.getPrice() != null ? item.getPrice() : "0";
+                            String digit = item.getDigit() != null ? item.getDigit() : "0";
+                            String rate = price + "-" + digit;
 
                             list.add(new GameRateModel(name, rate));
                         }
@@ -105,14 +104,8 @@ public class GameRatesActivity extends AppCompatActivity {
                 });
     }
 
-
-
-    // =====================================================
-    // BACK PRESS (DOUBLE TAP EXIT)
-    // =====================================================
     @Override
     public void onBackPressed() {
-        // Go back to Home Activity
         Intent intent = new Intent(this, HomeActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);

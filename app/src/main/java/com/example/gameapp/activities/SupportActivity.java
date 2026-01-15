@@ -1,9 +1,12 @@
 package com.example.gameapp.activities;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +25,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class SupportActivity extends AppCompatActivity {
+
+    private static final String TAG = "SupportActivity";
 
     private MaterialCardView rowCall, rowWhatsapp, rowEmail, rowTelegram, rowProof;
     private TextView txtCallNumber, txtWhatsappNumber, txtEmail, txtNoData;
@@ -52,6 +57,8 @@ public class SupportActivity extends AppCompatActivity {
         txtNoData = findViewById(R.id.txtNoData);
 
         progressBar = findViewById(R.id.progressBar);
+
+        Log.d(TAG, "Views initialized successfully");
     }
 
     private void fetchSupportData() {
@@ -71,15 +78,19 @@ public class SupportActivity extends AppCompatActivity {
 
                         progressBar.setVisibility(View.GONE);
 
+                        Log.d(TAG, "Response received: " + response.isSuccessful());
+
                         if (response.isSuccessful()
                                 && response.body() != null
                                 && response.body().isStatus()
                                 && response.body().getData() != null) {
 
                             supportData = response.body().getData();
+                            Log.d(TAG, "Support data received");
                             displaySupportOptions();
 
                         } else {
+                            Log.e(TAG, "Invalid response or no data");
                             showNoDataMessage();
                         }
                     }
@@ -87,6 +98,7 @@ public class SupportActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(Call<SupportResponse> call, Throwable t) {
                         progressBar.setVisibility(View.GONE);
+                        Log.e(TAG, "API call failed: " + t.getMessage());
                         Toast.makeText(SupportActivity.this,
                                 "Failed to load support details",
                                 Toast.LENGTH_SHORT).show();
@@ -98,49 +110,99 @@ public class SupportActivity extends AppCompatActivity {
     // ================= DYNAMIC UI =================
 
     private void displaySupportOptions() {
+        Log.d(TAG, "displaySupportOptions called");
 
         boolean hasAnyData = false;
 
+        // CALL
         if (supportData.hasValidContact()) {
+            Log.d(TAG, "Setting up Call option: " + supportData.getContactNo());
             rowCall.setVisibility(View.VISIBLE);
             txtCallNumber.setText(supportData.getContactNo());
-            rowCall.setOnClickListener(v ->
-                    dialNumber(supportData.getContactNo()));
+
+            // Get the LinearLayout inside the card and set click on it
+            LinearLayout callLayout = (LinearLayout) rowCall.getChildAt(0);
+            callLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d(TAG, "Call clicked");
+                    dialNumber(supportData.getContactNo());
+                }
+            });
             hasAnyData = true;
         }
 
+        // WHATSAPP
         if (supportData.hasValidWhatsapp()) {
+            Log.d(TAG, "Setting up WhatsApp option: " + supportData.getWhatsappNo());
             rowWhatsapp.setVisibility(View.VISIBLE);
             txtWhatsappNumber.setText(supportData.getWhatsappNo());
-            rowWhatsapp.setOnClickListener(v ->
-                    openWhatsApp(supportData.getWhatsappNo()));
+
+            LinearLayout whatsappLayout = (LinearLayout) rowWhatsapp.getChildAt(0);
+            whatsappLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d(TAG, "WhatsApp clicked");
+                    openWhatsApp(supportData.getWhatsappNo());
+                }
+            });
             hasAnyData = true;
         }
 
+        // EMAIL
         if (supportData.hasValidEmail()) {
+            Log.d(TAG, "Setting up Email option: " + supportData.getEmailId());
             rowEmail.setVisibility(View.VISIBLE);
             txtEmail.setText(supportData.getEmailId());
-            rowEmail.setOnClickListener(v ->
-                    sendEmail(supportData.getEmailId()));
+
+            LinearLayout emailLayout = (LinearLayout) rowEmail.getChildAt(0);
+            emailLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d(TAG, "Email clicked");
+                    sendEmail(supportData.getEmailId());
+                }
+            });
             hasAnyData = true;
         }
 
+        // TELEGRAM
         if (supportData.hasValidTelegram()) {
+            Log.d(TAG, "Setting up Telegram option");
             rowTelegram.setVisibility(View.VISIBLE);
-            rowTelegram.setOnClickListener(v ->
-                    openLink(supportData.getTelegramLink()));
+
+            LinearLayout telegramLayout = (LinearLayout) rowTelegram.getChildAt(0);
+            telegramLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d(TAG, "Telegram clicked");
+                    openLink(supportData.getTelegramLink());
+                }
+            });
             hasAnyData = true;
         }
 
+        // PROOF
         if (supportData.hasValidProof()) {
+            Log.d(TAG, "Setting up Proof option");
             rowProof.setVisibility(View.VISIBLE);
-            rowProof.setOnClickListener(v ->
-                    openLink(supportData.getProofLink()));
+
+            LinearLayout proofLayout = (LinearLayout) rowProof.getChildAt(0);
+            proofLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d(TAG, "Proof clicked");
+                    openLink(supportData.getProofLink());
+                }
+            });
             hasAnyData = true;
         }
 
         if (!hasAnyData) {
+            Log.d(TAG, "No valid data found");
             showNoDataMessage();
+        } else {
+            Log.d(TAG, "Support options displayed successfully");
         }
     }
 
@@ -161,29 +223,143 @@ public class SupportActivity extends AppCompatActivity {
     // ================= ACTIONS =================
 
     private void dialNumber(String number) {
-        startActivity(new Intent(Intent.ACTION_DIAL,
-                Uri.parse("tel:" + number)));
+        Log.d(TAG, "dialNumber called with: " + number);
+        try {
+            Intent intent = new Intent(Intent.ACTION_DIAL,
+                    Uri.parse("tel:" + number));
+            startActivity(intent);
+            Log.d(TAG, "Dialer opened successfully");
+        } catch (Exception e) {
+            Log.e(TAG, "Error opening dialer: " + e.getMessage());
+            Toast.makeText(this,
+                    "Unable to open dialer",
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void openWhatsApp(String number) {
-        String clean = number.replaceAll("[^0-9]", "");
-        String url = "https://wa.me/" + clean;
-        openLink(url);
+        Log.d(TAG, "openWhatsApp called with: " + number);
+        try {
+            // Remove all non-numeric characters except +
+            String clean = number.replaceAll("[^0-9+]", "");
+
+            // Remove leading + if present for wa.me link
+            if (clean.startsWith("+")) {
+                clean = clean.substring(1);
+            }
+
+            String url = "https://wa.me/" + clean;
+            Log.d(TAG, "WhatsApp URL: " + url);
+
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
+            Log.d(TAG, "WhatsApp opened successfully");
+        } catch (Exception e) {
+            Log.e(TAG, "Error opening WhatsApp: " + e.getMessage());
+            Toast.makeText(this,
+                    "WhatsApp is not installed",
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void sendEmail(String email) {
-        Intent intent = new Intent(Intent.ACTION_SENDTO);
-        intent.setData(Uri.parse("mailto:" + email));
-        intent.putExtra(Intent.EXTRA_SUBJECT, "Support Request");
-        startActivity(intent);
+        Log.d(TAG, "sendEmail called with: " + email);
+        try {
+            Intent intent = new Intent(Intent.ACTION_SENDTO);
+            intent.setData(Uri.parse("mailto:" + email));
+            intent.putExtra(Intent.EXTRA_SUBJECT, "Support Request");
+            intent.putExtra(Intent.EXTRA_TEXT, "");
+
+            Intent chooser = Intent.createChooser(intent, "Send Email");
+
+            if (chooser.resolveActivity(getPackageManager()) != null) {
+                startActivity(chooser);
+                Log.d(TAG, "Email app opened successfully");
+            } else {
+                Log.e(TAG, "No email app found");
+                Toast.makeText(this,
+                        "No email app found. Please install an email app.",
+                        Toast.LENGTH_LONG).show();
+            }
+        } catch (ActivityNotFoundException e) {
+            Log.e(TAG, "No email app available: " + e.getMessage());
+            Toast.makeText(this,
+                    "No email app found. Please install an email app.",
+                    Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Log.e(TAG, "Error opening email: " + e.getMessage(), e);
+            Toast.makeText(this,
+                    "Unable to send email: " + e.getMessage(),
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void openLink(String link) {
+        Log.d(TAG, "openLink called with: " + link);
         try {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
+            // Trim whitespace
+            link = link.trim();
+
+            // Ensure link has proper schema
+            if (!link.startsWith("http://") && !link.startsWith("https://")) {
+                link = "https://" + link;
+            }
+
+            Log.d(TAG, "Final URL: " + link);
+
+            // Create intent to open the link
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(link));
+
+            // Try to start the activity directly without checking resolveActivity
+            try {
+                startActivity(intent);
+                Log.d(TAG, "Link opened successfully");
+            } catch (ActivityNotFoundException e) {
+                // If no app can handle it, show error
+                Log.e(TAG, "No app can handle this link: " + e.getMessage());
+                Toast.makeText(this,
+                        "No app found to open this link. Please install a browser or the appropriate app.",
+                        Toast.LENGTH_LONG).show();
+            }
         } catch (Exception e) {
+            Log.e(TAG, "Error opening link: " + e.getMessage(), e);
             Toast.makeText(this,
-                    "Invalid link",
+                    "Unable to open link: " + e.getMessage(),
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // Alternative method with chooser for better compatibility
+    private void openLinkWithChooser(String link) {
+        Log.d(TAG, "openLinkWithChooser called with: " + link);
+        try {
+            link = link.trim();
+
+            if (!link.startsWith("http://") && !link.startsWith("https://")) {
+                link = "https://" + link;
+            }
+
+            Log.d(TAG, "Final URL: " + link);
+
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
+
+            // Create chooser to let user select which app to use
+            Intent chooser = Intent.createChooser(intent, "Open link with");
+
+            try {
+                startActivity(chooser);
+                Log.d(TAG, "Link opened with chooser successfully");
+            } catch (ActivityNotFoundException e) {
+                Log.e(TAG, "No app available: " + e.getMessage());
+                Toast.makeText(this,
+                        "No app found to open this link",
+                        Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error opening link: " + e.getMessage(), e);
+            Toast.makeText(this,
+                    "Unable to open link",
                     Toast.LENGTH_SHORT).show();
         }
     }

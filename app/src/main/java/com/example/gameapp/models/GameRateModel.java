@@ -1,7 +1,6 @@
 package com.example.gameapp.models;
 
 public class GameRateModel {
-
     public String name;
     public String rate;
 

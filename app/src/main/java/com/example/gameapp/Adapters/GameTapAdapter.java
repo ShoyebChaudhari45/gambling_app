@@ -74,32 +74,63 @@ public class GameTapAdapter
         h.txtCloseTime.setText(closeTime);
 
         // ================= STATUS DECISION =================
-        String status;
+        // Priority: open > upcoming > closed
+        String status = "closed";
         TapsResponse.Tap playableTap = null;
         String tapType = null;
 
+        // Check open tap first
         if (openTap != null) {
-            status = openTap.getStatus();
-            playableTap = openTap;
-            tapType = "open";
-        } else if (closeTap != null) {
-            status = closeTap.getStatus();
-            playableTap = closeTap;
-            tapType = "close";
-        } else {
-            status = "closed";
+            String openStatus = openTap.getStatus();
+            if ("open".equalsIgnoreCase(openStatus)) {
+                status = "open";
+                playableTap = openTap;
+                tapType = "open";
+            } else if ("upcoming".equalsIgnoreCase(openStatus)) {
+                status = "upcoming";
+                playableTap = openTap;
+                tapType = "open";
+            }
+        }
+
+        // If open tap is not available or closed, check close tap
+        if (playableTap == null && closeTap != null) {
+            String closeStatus = closeTap.getStatus();
+            if ("open".equalsIgnoreCase(closeStatus)) {
+                status = "open";
+                playableTap = closeTap;
+                tapType = "close";
+            } else if ("upcoming".equalsIgnoreCase(closeStatus)) {
+                status = "upcoming";
+                playableTap = closeTap;
+                tapType = "close";
+            }
+        }
+
+        // If still no playable tap found, use whatever is available for display
+        if (playableTap == null) {
+            if (openTap != null) {
+                status = openTap.getStatus() != null ? openTap.getStatus() : "closed";
+                playableTap = openTap;
+                tapType = "open";
+            } else if (closeTap != null) {
+                status = closeTap.getStatus() != null ? closeTap.getStatus() : "closed";
+                playableTap = closeTap;
+                tapType = "close";
+            }
         }
 
         // ================= STATUS UI =================
         setupStatus(h.txtStatus, h.cardStatus, h.txtPlayGame, status);
 
         // ================= PLAY BUTTON =================
-        boolean isPlayable = "open".equalsIgnoreCase(status);
+        boolean isClickable = "open".equalsIgnoreCase(status)
+                || "upcoming".equalsIgnoreCase(status);
 
-        setupPlayButton(h.btnPlay, h.imgPlayIcon, isPlayable);
+        setupPlayButton(h.btnPlay, h.imgPlayIcon, status, isClickable);
 
         // ================= CLICK =================
-        if (isPlayable && playableTap != null) {
+        if (isClickable && playableTap != null) {
             TapsResponse.Tap finalTap = playableTap;
             String finalType = tapType;
 
@@ -111,6 +142,8 @@ public class GameTapAdapter
         } else {
             h.cardGame.setOnClickListener(null);
             h.btnPlay.setOnClickListener(null);
+            h.cardGame.setClickable(false);
+            h.btnPlay.setClickable(false);
         }
     }
 
@@ -126,23 +159,23 @@ public class GameTapAdapter
 
             case "open":
                 txtStatus.setText("OPEN");
-                txtStatus.setTextColor(0xFF4CAF50);
-                cardStatus.setCardBackgroundColor(0xFFE8F5E9);
-                txtPlayGame.setTextColor(0xFF4CAF50);
+                txtStatus.setTextColor(0xFFFFFFFF); // White text
+                cardStatus.setCardBackgroundColor(0xFF4CAF50); // Green background
+                txtPlayGame.setTextColor(0xFF4CAF50); // Green text
                 break;
 
             case "upcoming":
                 txtStatus.setText("UPCOMING");
-                txtStatus.setTextColor(0xFF4CAF50);
-                cardStatus.setCardBackgroundColor(0xFFE8F5E9);
-                txtPlayGame.setTextColor(0xFF999999);
+                txtStatus.setTextColor(0xFFFFFFFF); // White text
+                cardStatus.setCardBackgroundColor(0xFFFF9800); // Orange background
+                txtPlayGame.setTextColor(0xFFFF9800); // Orange text
                 break;
 
-            default:
+            default: // closed
                 txtStatus.setText("CLOSED");
-                txtStatus.setTextColor(0xFFD32F2F);
-                cardStatus.setCardBackgroundColor(0xFFFFEBEE);
-                txtPlayGame.setTextColor(0xFF999999);
+                txtStatus.setTextColor(0xFFFFFFFF); // White text
+                cardStatus.setCardBackgroundColor(0xFFD32F2F); // Red background
+                txtPlayGame.setTextColor(0xFF999999); // Gray text
                 break;
         }
     }
@@ -150,21 +183,41 @@ public class GameTapAdapter
     // ================= PLAY BUTTON =================
     private void setupPlayButton(MaterialCardView btnPlay,
                                  ImageView imgIcon,
+                                 String status,
                                  boolean enabled) {
 
         btnPlay.setClickable(enabled);
         btnPlay.setFocusable(enabled);
 
-        if (enabled) {
-            btnPlay.setCardBackgroundColor(0xFFD32F2F);
-            btnPlay.setCardElevation(4f);
-            btnPlay.setAlpha(1f);
-            imgIcon.setAlpha(1f);
-        } else {
-            btnPlay.setCardBackgroundColor(0xFFBDBDBD);
-            btnPlay.setCardElevation(0f);
-            btnPlay.setAlpha(0.5f);
-            imgIcon.setAlpha(0.5f);
+        if (status == null) status = "closed";
+
+        switch (status.toLowerCase()) {
+            case "open":
+                // Green play button
+                btnPlay.setCardBackgroundColor(0xFF4CAF50); // Green
+                btnPlay.setCardElevation(4f);
+                btnPlay.setAlpha(1f);
+                imgIcon.setImageResource(R.drawable.ic_play);
+                imgIcon.setAlpha(1f);
+                break;
+
+            case "upcoming":
+                // Orange clock button
+                btnPlay.setCardBackgroundColor(0xFFFF9800); // Orange
+                btnPlay.setCardElevation(4f);
+                btnPlay.setAlpha(1f);
+                imgIcon.setImageResource(R.drawable.ic_clock);
+                imgIcon.setAlpha(1f);
+                break;
+
+            default: // closed
+                // Red pause button (disabled)
+                btnPlay.setCardBackgroundColor(0xFFD32F2F); // Red
+                btnPlay.setCardElevation(0f);
+                btnPlay.setAlpha(0.5f);
+                imgIcon.setImageResource(R.drawable.ic_pause);
+                imgIcon.setAlpha(0.5f);
+                break;
         }
     }
 

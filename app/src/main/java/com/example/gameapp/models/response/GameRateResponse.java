@@ -14,6 +14,14 @@ public class GameRateResponse {
     @SerializedName("data")
     private List<GameRateItem> data;
 
+    public int getStatusCode() {
+        return statusCode;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
     public List<GameRateItem> getData() {
         return data;
     }

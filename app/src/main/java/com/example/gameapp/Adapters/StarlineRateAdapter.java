@@ -36,11 +36,15 @@ public class StarlineRateAdapter extends RecyclerView.Adapter<StarlineRateAdapte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         StarlineRatesResponse.StarlineRate rate = rates.get(position);
 
-        // Set game name
-        holder.txtGameName.setText(getGameDisplayName(rate.getGame()));
+        // Use game name directly from backend
+        String gameName = rate.getGame() != null ? rate.getGame() : "Unknown";
+        holder.txtGameName.setText(gameName);
 
-        // Set digit range
-        holder.txtDigitRange.setText(rate.getDigit());
+        // Set price range (price-digit format like "10-95")
+        String price = rate.getPrice() != null ? rate.getPrice() : "0";
+        String digit = rate.getDigit() != null ? rate.getDigit() : "0";
+        String priceRange = price + "-" + digit;
+        holder.txtPriceRange.setText(priceRange);
     }
 
     @Override
@@ -48,26 +52,13 @@ public class StarlineRateAdapter extends RecyclerView.Adapter<StarlineRateAdapte
         return rates.size();
     }
 
-    private String getGameDisplayName(String game) {
-        switch (game.toUpperCase()) {
-            case "JODI":
-                return "Single Digit";
-            case "PATTE":
-                return "Single Pana";
-            case "TP":
-                return "Triple Pana";
-            default:
-                return game;
-        }
-    }
-
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView txtGameName, txtDigitRange;
+        TextView txtGameName, txtPriceRange;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             txtGameName = itemView.findViewById(R.id.txtGameName);
-            txtDigitRange = itemView.findViewById(R.id.txtDigitRange);
+            txtPriceRange = itemView.findViewById(R.id.txtPriceRange);
         }
     }
 }

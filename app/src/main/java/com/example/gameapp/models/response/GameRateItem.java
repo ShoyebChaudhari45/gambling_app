@@ -16,6 +16,10 @@ public class GameRateItem {
     @SerializedName("price")
     private String price;
 
+    public int getId() {
+        return id;
+    }
+
     public String getGame() {
         return game;
     }

@@ -56,5 +56,9 @@
     <color name="light_blue">#E0ECFF</color>
     <color name="whatsapp_green">#25D366</color>
     <color name="overlay_dark">#80000000</color>
+    <color name="status_open">#4CAF50</color>        <!-- Green -->
+    <color name="status_upcoming">#FF9800</color>    <!-- Orange -->
+    <color name="status_closed">#D32F2F</color>      <!-- Red -->
+
 
 </resources>

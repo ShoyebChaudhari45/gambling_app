@@ -28,12 +28,12 @@
             android:textColor="#FF6B00"
             android:fontFamily="sans-serif-medium"/>
 
-        <!-- DIGIT RANGE -->
+        <!-- PRICE RANGE -->
         <TextView
-            android:id="@+id/txtDigitRange"
+            android:id="@+id/txtPriceRange"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="10-100"
+            android:text="10-95"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="#D32F2F"
