@@ -37,7 +37,11 @@ public class GameTypesActivity extends AppCompatActivity {
     private final List<GameType> gameTypes = new ArrayList<>();
     private GameTypeAdapter adapter;
 
-    private String tapId, tapType, gameName, endTime, status;
+    // ❌ OLD (WRONG):
+    // private String tapId;
+    // ✅ NEW (CORRECT):
+    private int tapId;
+    private String tapType, gameName, endTime, status;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +52,6 @@ public class GameTypesActivity extends AppCompatActivity {
         initViews();
         setupRecyclerView();
         loadGameTypes();
-        ImageButton btnBack= findViewById(R.id.btnBack);
 
         btnBack.setOnClickListener(v -> {
             Intent intent = new Intent(GameTypesActivity.this, HomeActivity.class);
@@ -56,32 +59,37 @@ public class GameTypesActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
-
     }
 
+    // ===================== INTENT DATA =====================
     private void getIntentData() {
-        tapId = getIntent().getStringExtra("tap_id");
+
+        // ⭐ tap_id is INTEGER in HomeActivity → MUST read as INT here
+        tapId = getIntent().getIntExtra("tap_id", -1);
+
         tapType = getIntent().getStringExtra("tap_type");
         gameName = getIntent().getStringExtra("game_name");
         endTime = getIntent().getStringExtra("end_time");
         status = getIntent().getStringExtra("status");
     }
 
+    // ===================== INIT VIEWS =====================
     private void initViews() {
         rvGameTypes = findViewById(R.id.rvGameTypes);
         txtTitle = findViewById(R.id.txtTitle);
         btnBack = findViewById(R.id.btnBack);
 
         txtTitle.setText(gameName + " - " + tapType);
-        btnBack.setOnClickListener(v -> finish());
     }
 
+    // ===================== RECYCLER VIEW =====================
     private void setupRecyclerView() {
         rvGameTypes.setLayoutManager(new GridLayoutManager(this, 2));
         adapter = new GameTypeAdapter(this, gameTypes, this::onGameTypeClick);
         rvGameTypes.setAdapter(adapter);
     }
 
+    // ===================== API CALL (GAME TYPES) =====================
     private void loadGameTypes() {
         ApiClient.getClient()
                 .create(ApiService.class)
@@ -108,24 +116,30 @@ public class GameTypesActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(Call<GamesResponse> call, Throwable t) {
                         Log.e(TAG, "API Error", t);
-                        toast(t.getMessage());
+                        toast("Error: " + t.getMessage());
                     }
                 });
     }
 
+    // ===================== ON GAME TYPE CLICK =====================
     private void onGameTypeClick(GameType gameType) {
 
         Intent intent = new Intent(this, BidActivity.class);
+
+        // ⭐ tap_id is sent as INT (correct!)
         intent.putExtra("tap_id", tapId);
+
         intent.putExtra("tap_type", tapType);
         intent.putExtra("game_name", gameName);
         intent.putExtra("game_type", gameType.getName());
-        intent.putExtra("game_image", gameType.getImage()); // ✅ Pass game image
+        intent.putExtra("game_image", gameType.getImage());
         intent.putExtra("end_time", endTime);
         intent.putExtra("status", status);
+
         startActivity(intent);
     }
 
+    // ===================== TOAST =====================
     private void toast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }

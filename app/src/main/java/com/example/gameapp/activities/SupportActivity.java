@@ -111,6 +111,8 @@ public class SupportActivity extends AppCompatActivity {
 
     private void displaySupportOptions() {
         Log.d(TAG, "displaySupportOptions called");
+        SessionManager.saveSupportWhatsapp(SupportActivity.this, supportData.getWhatsappNo());
+
 
         boolean hasAnyData = false;
 

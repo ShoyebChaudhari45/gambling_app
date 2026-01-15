@@ -4,6 +4,7 @@ import com.example.gameapp.models.request.ChangePasswordRequest;
 import com.example.gameapp.models.request.DepositRequest;
 import com.example.gameapp.models.request.ForgotPasswordRequest;
 import com.example.gameapp.models.request.LoginRequest;
+import com.example.gameapp.models.request.LotteryRateRequest;
 import com.example.gameapp.models.request.RegisterRequest;
 import com.example.gameapp.models.request.ResendOtpRequest;
 import com.example.gameapp.models.request.ResetPasswordRequest;
@@ -16,6 +17,7 @@ import com.example.gameapp.models.response.GameRateResponse;
 import com.example.gameapp.models.response.GamesResponse;
 import com.example.gameapp.models.response.GenericResponse;
 import com.example.gameapp.models.response.LoginResponse;
+import com.example.gameapp.models.response.LotteryRateResponse;
 import com.example.gameapp.models.response.PriceResponse;
 import com.example.gameapp.models.response.RegisterResponse;
 import com.example.gameapp.models.response.StarlineRatesResponse;
@@ -146,6 +148,13 @@ public interface ApiService {
     Call<GameRateResponse> getGameRates(
             @Header("Authorization") String token
     );
+    @POST("lottery")
+    Call<LotteryRateResponse> placeBid(
+            @Header("Authorization") String token,
+            @Header("Accept") String accept,
+            @Body LotteryRateRequest request
+    );
+
 
 }
 //46|Q3mgxI7zB62rDYzmpZrxmlp8Achw43lyDL0TEpPda`c7a5f73

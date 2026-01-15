@@ -1,6 +1,7 @@
 package com.example.gameapp.activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -41,6 +42,7 @@ public class HomeActivity extends AppCompatActivity {
     private long lastBackPressedTime = 0;
 
     private TextView txtPlayerName, txtPlayerMobile, txtViewProfile;
+    private TextView txtBalance; // ⭐ MAIN BALANCE TextView
 
     private static final String TAG = "HomeActivity";
 
@@ -67,6 +69,9 @@ public class HomeActivity extends AppCompatActivity {
         btnMenu = findViewById(R.id.btnMenu);
         rvGameTaps = findViewById(R.id.rvGameTaps);
 
+        // ⭐ BALANCE TextView in HEADER
+        txtBalance = findViewById(R.id.txtBalance);
+
         View headerView = navigationView.getHeaderView(0);
         txtPlayerName = headerView.findViewById(R.id.txtPlayerName);
         txtPlayerMobile = headerView.findViewById(R.id.txtPlayerMobile);
@@ -90,11 +95,17 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void setupActionButtons() {
-        findViewById(R.id.btnWhatsApp).setOnClickListener(v ->
-                toast("Opening WhatsApp...")
-        );
+        findViewById(R.id.btnWhatsApp).setOnClickListener(v -> {
+            String number = SessionManager.getSupportWhatsapp(this);
 
-        // ✅ UPDATED: Navigate to StarlineActivity
+            if (number == null || number.isEmpty()) {
+                toast("Support WhatsApp number not available");
+                return;
+            }
+
+            openWhatsApp(number);
+        });
+
         findViewById(R.id.btnStarline).setOnClickListener(v ->
                 startActivity(new Intent(this, StarlineActivity.class))
         );
@@ -179,10 +190,10 @@ public class HomeActivity extends AppCompatActivity {
                             txtPlayerName.setText(user.name);
                             txtPlayerMobile.setText(user.mobileNo);
 
-                            SessionManager.saveBalance(
-                                    HomeActivity.this,
-                                    user.balance
-                            );
+                            // ⭐ SAVE & DISPLAY BALANCE
+                            SessionManager.saveBalance(HomeActivity.this, user.balance);
+                            updateBalanceUI();
+
                             SessionManager.saveEmail(HomeActivity.this, user.email);
 
                             Log.d(TAG, "User loaded: " + user.name);
@@ -273,7 +284,7 @@ public class HomeActivity extends AppCompatActivity {
         i.putExtra("game_name", tap.getGameName());
         i.putExtra("end_time", tap.getEndTime());
         i.putExtra("status", tap.getStatus());
-        startActivity(i);
+        startActivityForResult(i, 101);
     }
 
     private void shareApp() {
@@ -286,6 +297,55 @@ public class HomeActivity extends AppCompatActivity {
 
     private void toast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    private void openWhatsApp(String number) {
+        Log.d(TAG, "openWhatsApp called with: " + number);
+        try {
+            String clean = number.replaceAll("[^0-9+]", "");
+
+            if (clean.startsWith("+")) {
+                clean = clean.substring(1);
+            }
+
+            String url = "https://wa.me/" + clean;
+            Log.d(TAG, "WhatsApp URL: " + url);
+
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
+            Log.d(TAG, "WhatsApp opened successfully");
+        } catch (Exception e) {
+            Log.e(TAG, "Error opening WhatsApp: " + e.getMessage());
+            Toast.makeText(this,
+                    "WhatsApp is not installed",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // ⭐ CRITICAL: UPDATE BALANCE WHEN RETURNING FROM BidActivity
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 101 && resultCode == RESULT_OK) {
+            // ⭐ Refresh balance from SessionManager
+            updateBalanceUI();
+        }
+    }
+
+    // ⭐ NEW METHOD: Refresh UI from SessionManager
+    private void updateBalanceUI() {
+        int balance = SessionManager.getBalance(this);
+        if (txtBalance != null) {
+            txtBalance.setText(String.valueOf(balance));
+        }
+    }
+
+    // ⭐ REFRESH BALANCE WHENEVER HOME SCREEN APPEARS
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateBalanceUI(); // Always refresh when user returns to home
     }
 
     @Override
@@ -301,3 +361,4 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 }
+
