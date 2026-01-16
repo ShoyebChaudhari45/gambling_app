@@ -2,8 +2,8 @@ package com.example.gameapp.models.request;
 
 public class WithdrawRequest {
 
-    private int price;
-    private String payment_mode;
+    private final int price;
+    private final String payment_mode;
 
     public WithdrawRequest(int price, String payment_mode) {
         this.price = price;

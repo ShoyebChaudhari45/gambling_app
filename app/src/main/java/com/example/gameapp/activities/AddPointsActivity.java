@@ -78,17 +78,15 @@ public class AddPointsActivity extends AppCompatActivity {
 
             int amount = Integer.parseInt(amountStr);
 
-            if (amount < 300) {
-                Toast.makeText(this, "Minimum deposit ₹300", Toast.LENGTH_SHORT).show();
-                return;
-            }
+            // ⭐ MINIMUM LIMIT REMOVED ⭐
+            // No check for min 300
 
             callDepositApi(amount);
         });
     }
 
     // =====================================================
-    // LOAD QUICK SELECT PRICES (BACKEND → UI)
+    // LOAD QUICK SELECT PRICES
     // =====================================================
     private void loadQuickPrices() {
 
@@ -112,7 +110,6 @@ public class AddPointsActivity extends AppCompatActivity {
 
                     for (String price : response.body().data) {
 
-                        // Create new row after every 3 buttons
                         if (count % 3 == 0) {
                             currentRow = new LinearLayout(AddPointsActivity.this);
                             currentRow.setOrientation(LinearLayout.HORIZONTAL);
@@ -150,7 +147,7 @@ public class AddPointsActivity extends AppCompatActivity {
     }
 
     // =====================================================
-    // CREATE PRICE BUTTON (LINEARLAYOUT SAFE)
+    // CREATE PRICE BUTTON
     // =====================================================
     private MaterialButton createPriceButton(String amount) {
 

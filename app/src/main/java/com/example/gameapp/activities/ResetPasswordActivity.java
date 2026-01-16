@@ -32,7 +32,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
     private TextView txtResendOtp;
     private View progressContainer;
     private String userEmail;
-    private long lastBackPressedTime = 0;
+    private final long lastBackPressedTime = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

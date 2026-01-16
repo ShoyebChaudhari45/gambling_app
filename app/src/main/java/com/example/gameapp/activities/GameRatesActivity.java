@@ -30,7 +30,7 @@ import retrofit2.Response;
 public class GameRatesActivity extends AppCompatActivity {
 
     private RecyclerView rv;
-    private long lastBackPressedTime = 0;
+    private final long lastBackPressedTime = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

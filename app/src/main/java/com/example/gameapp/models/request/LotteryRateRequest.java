@@ -4,10 +4,10 @@ package com.example.gameapp.models.request;
 
 public class LotteryRateRequest {
 
-    private int time_id;
-    private String type;
-    private String digit;
-    private int price;
+    private final int time_id;
+    private final String type;
+    private final String digit;
+    private final int price;
 
     public LotteryRateRequest(int time_id, String type, String digit, int price) {
         this.time_id = time_id;

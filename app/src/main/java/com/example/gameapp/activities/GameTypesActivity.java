@@ -21,6 +21,7 @@ import com.example.gameapp.session.SessionManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -37,11 +38,9 @@ public class GameTypesActivity extends AppCompatActivity {
     private final List<GameType> gameTypes = new ArrayList<>();
     private GameTypeAdapter adapter;
 
-    // ❌ OLD (WRONG):
-    // private String tapId;
-    // ✅ NEW (CORRECT):
-    private int tapId;
-    private String tapType, gameName, endTime, status;
+    private int openId = -1;
+    private int closeId = -1;
+    private String gameName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,35 +60,28 @@ public class GameTypesActivity extends AppCompatActivity {
         });
     }
 
-    // ===================== INTENT DATA =====================
     private void getIntentData() {
-
-        // ⭐ tap_id is INTEGER in HomeActivity → MUST read as INT here
-        tapId = getIntent().getIntExtra("tap_id", -1);
-
-        tapType = getIntent().getStringExtra("tap_type");
+        openId = getIntent().getIntExtra("open_id", -1);
+        closeId = getIntent().getIntExtra("close_id", -1);
         gameName = getIntent().getStringExtra("game_name");
-        endTime = getIntent().getStringExtra("end_time");
-        status = getIntent().getStringExtra("status");
+
+        Log.d(TAG, "Received - Game: " + gameName + ", Open ID: " + openId + ", Close ID: " + closeId);
     }
 
-    // ===================== INIT VIEWS =====================
     private void initViews() {
         rvGameTypes = findViewById(R.id.rvGameTypes);
         txtTitle = findViewById(R.id.txtTitle);
         btnBack = findViewById(R.id.btnBack);
 
-        txtTitle.setText(gameName + " - " + tapType);
+        txtTitle.setText(gameName);
     }
 
-    // ===================== RECYCLER VIEW =====================
     private void setupRecyclerView() {
         rvGameTypes.setLayoutManager(new GridLayoutManager(this, 2));
         adapter = new GameTypeAdapter(this, gameTypes, this::onGameTypeClick);
         rvGameTypes.setAdapter(adapter);
     }
 
-    // ===================== API CALL (GAME TYPES) =====================
     private void loadGameTypes() {
         ApiClient.getClient()
                 .create(ApiService.class)
@@ -121,25 +113,33 @@ public class GameTypesActivity extends AppCompatActivity {
                 });
     }
 
-    // ===================== ON GAME TYPE CLICK =====================
     private void onGameTypeClick(GameType gameType) {
 
         Intent intent = new Intent(this, BidActivity.class);
 
-        // ⭐ tap_id is sent as INT (correct!)
-        intent.putExtra("tap_id", tapId);
-
-        intent.putExtra("tap_type", tapType);
+        intent.putExtra("open_id", openId);
+        intent.putExtra("close_id", closeId);
         intent.putExtra("game_name", gameName);
-        intent.putExtra("game_type", gameType.getName());
         intent.putExtra("game_image", gameType.getImage());
-        intent.putExtra("end_time", endTime);
-        intent.putExtra("status", status);
+
+        // 🔥 FINAL CONFIRMED TYPE MAPPING
+        String uiName = gameType.getName().trim().toUpperCase(Locale.ENGLISH);
+        String backendType = "DP"; // DEFAULT for ALL GAMES
+
+        if (uiName.equals("SP"))
+            backendType = "SP";
+        else if (uiName.equals("DP"))
+            backendType = "DP";
+        else if (uiName.equals("TRIPPLE PANNA"))
+            backendType = "TP";
+
+        intent.putExtra("game_type", backendType);
+
+        Log.d(TAG, "Selected UI Game=" + uiName + " -> Backend Type=" + backendType);
 
         startActivity(intent);
     }
 
-    // ===================== TOAST =====================
     private void toast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }

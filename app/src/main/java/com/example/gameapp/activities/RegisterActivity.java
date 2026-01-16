@@ -29,7 +29,7 @@ import android.text.InputType;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private long lastBackPressedTime = 0;
+    private final long lastBackPressedTime = 0;
     private boolean doubleBackToExitPressedOnce = false;
     private static final String TAG = "REGISTER_API";
 

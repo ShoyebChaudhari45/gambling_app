@@ -6,7 +6,10 @@ public class GameType {
 
     @SerializedName("name")
     private String name;
-
+    @SerializedName("api_type")
+    private String apiType;
+    @SerializedName("code")
+    private String code;
     @SerializedName("image")
     private String image;
 
@@ -16,5 +19,8 @@ public class GameType {
 
     public String getImage() {
         return image;
+    }
+    public String getCode() { return code;}public String getApiType() {
+        return apiType;
     }
 }

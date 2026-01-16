@@ -28,7 +28,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     private EditText edtEmail;
     private MaterialButton btnSendOtp;
     private View progressContainer;
-    private long lastBackPressedTime = 0;
+    private final long lastBackPressedTime = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

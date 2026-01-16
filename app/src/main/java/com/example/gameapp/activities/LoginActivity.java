@@ -30,7 +30,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText edtMobile, edtPassword;
     private View progressContainer;
-    private long lastBackPressedTime = 0;
+    private final long lastBackPressedTime = 0;
 
 
     // 🔐 Password rule:

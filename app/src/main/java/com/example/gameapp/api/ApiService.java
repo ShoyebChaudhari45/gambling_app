@@ -10,6 +10,7 @@ import com.example.gameapp.models.request.ResendOtpRequest;
 import com.example.gameapp.models.request.ResetPasswordRequest;
 import com.example.gameapp.models.request.UpdateProfileRequest;
 import com.example.gameapp.models.request.WithdrawRequest;
+import com.example.gameapp.models.response.BidHistoryResponse;
 import com.example.gameapp.models.response.ChangePasswordResponse;
 import com.example.gameapp.models.response.CommonResponse;
 import com.example.gameapp.models.response.DepositResponse;
@@ -34,6 +35,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
+import retrofit2.http.Query;
 
 public interface ApiService {
 
@@ -154,7 +156,18 @@ public interface ApiService {
             @Header("Accept") String accept,
             @Body LotteryRateRequest request
     );
-
+    /**
+     * Fetch bid history for a given date range
+     * @param startDate Format: yyyy-M-d (e.g., "2026-1-1")
+     * @param endDate Format: yyyy-M-d (e.g., "2026-1-17")
+     * @return BidHistoryResponse containing list of bids
+     */
+    @GET("lottery/list")
+    Call<BidHistoryResponse> getBidHistory(
+            @Header("Authorization") String token,
+            @Query("start_date") String startDate,
+            @Query("end_date") String endDate
+    );
 
 }
 //46|Q3mgxI7zB62rDYzmpZrxmlp8Achw43lyDL0TEpPda`c7a5f73

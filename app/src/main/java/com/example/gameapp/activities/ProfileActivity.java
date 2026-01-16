@@ -38,7 +38,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     // Edit mode state
     private boolean isEditMode = false;
-    private long lastBackPressedTime = 0;
+    private final long lastBackPressedTime = 0;
 
 
     @Override

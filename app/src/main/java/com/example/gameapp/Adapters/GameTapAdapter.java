@@ -1,6 +1,7 @@
 package com.example.gameapp.Adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,8 +21,11 @@ import java.util.List;
 public class GameTapAdapter
         extends RecyclerView.Adapter<GameTapAdapter.Holder> {
 
+    private static final String TAG = "GameTapAdapter";
+
     public interface OnGameTapClickListener {
-        void onGameTapClick(TapsResponse.Tap tap, String type);
+        void onGameTapClick(TapsResponse.Tap openTap,
+                            TapsResponse.Tap closeTap);
     }
 
     private final Context context;
@@ -49,174 +53,124 @@ public class GameTapAdapter
 
         GameItem item = list.get(position);
 
-        TapsResponse.Tap openTap  = item.getOpenTap();
+        TapsResponse.Tap openTap = item.getOpenTap();
         TapsResponse.Tap closeTap = item.getCloseTap();
 
-        // ================= GAME NAME =================
         h.txtGameName.setText(item.getGameName().toUpperCase());
 
-        // RESULT (STATIC)
-        h.txtResultCode.setText("***-**-***");
+        // ⭐ FIX: Display result if available
+        String resultText = getResultText(openTap, closeTap);
+        h.txtResultCode.setText(resultText);
 
-        // ================= TIME LOGIC =================
-        String openTime  = "--:--";
-        String closeTime = "--:--";
+        h.txtOpenTime.setText(
+                openTap != null ? openTap.getEndTime() : "--:--"
+        );
+        h.txtCloseTime.setText(
+                closeTap != null ? closeTap.getEndTime() : "--:--"
+        );
 
-        if (openTap != null && openTap.getEndTime() != null) {
-            openTime = openTap.getEndTime();
-        }
+        // ⭐ FIX: Determine status from both taps
+        String status = determineGameStatus(openTap, closeTap);
 
-        if (closeTap != null && closeTap.getEndTime() != null) {
-            closeTime = closeTap.getEndTime();
-        }
+        Log.d(TAG, item.getGameName() + " - Final Status: " + status);
 
-        h.txtOpenTime.setText(openTime);
-        h.txtCloseTime.setText(closeTime);
-
-        // ================= STATUS DECISION =================
-        // Priority: open > upcoming > closed
-        String status = "closed";
-        TapsResponse.Tap playableTap = null;
-        String tapType = null;
-
-        // Check open tap first
-        if (openTap != null) {
-            String openStatus = openTap.getStatus();
-            if ("open".equalsIgnoreCase(openStatus)) {
-                status = "open";
-                playableTap = openTap;
-                tapType = "open";
-            } else if ("upcoming".equalsIgnoreCase(openStatus)) {
-                status = "upcoming";
-                playableTap = openTap;
-                tapType = "open";
-            }
-        }
-
-        // If open tap is not available or closed, check close tap
-        if (playableTap == null && closeTap != null) {
-            String closeStatus = closeTap.getStatus();
-            if ("open".equalsIgnoreCase(closeStatus)) {
-                status = "open";
-                playableTap = closeTap;
-                tapType = "close";
-            } else if ("upcoming".equalsIgnoreCase(closeStatus)) {
-                status = "upcoming";
-                playableTap = closeTap;
-                tapType = "close";
-            }
-        }
-
-        // If still no playable tap found, use whatever is available for display
-        if (playableTap == null) {
-            if (openTap != null) {
-                status = openTap.getStatus() != null ? openTap.getStatus() : "closed";
-                playableTap = openTap;
-                tapType = "open";
-            } else if (closeTap != null) {
-                status = closeTap.getStatus() != null ? closeTap.getStatus() : "closed";
-                playableTap = closeTap;
-                tapType = "close";
-            }
-        }
-
-        // ================= STATUS UI =================
         setupStatus(h.txtStatus, h.cardStatus, h.txtPlayGame, status);
+        setupPlayButton(h.btnPlay, h.imgPlayIcon, status);
 
-        // ================= PLAY BUTTON =================
-        boolean isClickable = "open".equalsIgnoreCase(status)
-                || "upcoming".equalsIgnoreCase(status);
-
-        setupPlayButton(h.btnPlay, h.imgPlayIcon, status, isClickable);
-
-        // ================= CLICK =================
-        if (isClickable && playableTap != null) {
-            TapsResponse.Tap finalTap = playableTap;
-            String finalType = tapType;
-
+        // Only allow click if not closed
+        if (!"closed".equalsIgnoreCase(status)) {
             h.cardGame.setOnClickListener(v ->
-                    listener.onGameTapClick(finalTap, finalType));
-
+                    listener.onGameTapClick(openTap, closeTap));
             h.btnPlay.setOnClickListener(v ->
-                    listener.onGameTapClick(finalTap, finalType));
+                    listener.onGameTapClick(openTap, closeTap));
         } else {
             h.cardGame.setOnClickListener(null);
             h.btnPlay.setOnClickListener(null);
-            h.cardGame.setClickable(false);
-            h.btnPlay.setClickable(false);
         }
     }
 
-    // ================= STATUS UI =================
+    // ⭐ NEW: Get result text (shows result if available, else shows ***)
+    private String getResultText(TapsResponse.Tap openTap, TapsResponse.Tap closeTap) {
+        // Try to get result from open tap first
+        if (openTap != null && openTap.getResult() != null && !openTap.getResult().isEmpty()) {
+            return openTap.getResult();
+        }
+
+        // Try close tap
+        if (closeTap != null && closeTap.getResult() != null && !closeTap.getResult().isEmpty()) {
+            return closeTap.getResult();
+        }
+
+        // Default placeholder
+        return "***-**-***";
+    }
+
+    // ⭐ FIX: Determine status by checking both taps
+    private String determineGameStatus(TapsResponse.Tap openTap, TapsResponse.Tap closeTap) {
+        String openStatus = openTap != null ? openTap.getStatus() : null;
+        String closeStatus = closeTap != null ? closeTap.getStatus() : null;
+
+        Log.d(TAG, "Open Status: " + openStatus + ", Close Status: " + closeStatus);
+
+        // If either tap is "running" or "open", game is open
+        if ("running".equalsIgnoreCase(openStatus) || "open".equalsIgnoreCase(openStatus)) {
+            return "open";
+        }
+        if ("running".equalsIgnoreCase(closeStatus) || "open".equalsIgnoreCase(closeStatus)) {
+            return "open";
+        }
+
+        // If either tap is "upcoming", game is upcoming
+        if ("upcoming".equalsIgnoreCase(openStatus) || "upcoming".equalsIgnoreCase(closeStatus)) {
+            return "upcoming";
+        }
+
+        // Otherwise, game is closed
+        return "closed";
+    }
+
     private void setupStatus(TextView txtStatus,
                              MaterialCardView cardStatus,
                              TextView txtPlayGame,
                              String status) {
 
-        if (status == null) status = "closed";
-
         switch (status.toLowerCase()) {
-
             case "open":
+            case "running":
                 txtStatus.setText("OPEN");
-                txtStatus.setTextColor(0xFFFFFFFF); // White text
-                cardStatus.setCardBackgroundColor(0xFF4CAF50); // Green background
-                txtPlayGame.setTextColor(0xFF4CAF50); // Green text
+                cardStatus.setCardBackgroundColor(0xFF4CAF50);
+                txtPlayGame.setTextColor(0xFF4CAF50);
                 break;
-
             case "upcoming":
                 txtStatus.setText("UPCOMING");
-                txtStatus.setTextColor(0xFFFFFFFF); // White text
-                cardStatus.setCardBackgroundColor(0xFFFF9800); // Orange background
-                txtPlayGame.setTextColor(0xFFFF9800); // Orange text
+                cardStatus.setCardBackgroundColor(0xFFFF9800);
+                txtPlayGame.setTextColor(0xFFFF9800);
                 break;
-
-            default: // closed
+            default:
                 txtStatus.setText("CLOSED");
-                txtStatus.setTextColor(0xFFFFFFFF); // White text
-                cardStatus.setCardBackgroundColor(0xFFD32F2F); // Red background
-                txtPlayGame.setTextColor(0xFF999999); // Gray text
+                cardStatus.setCardBackgroundColor(0xFFD32F2F);
+                txtPlayGame.setTextColor(0xFF999999);
                 break;
         }
     }
 
-    // ================= PLAY BUTTON =================
     private void setupPlayButton(MaterialCardView btnPlay,
                                  ImageView imgIcon,
-                                 String status,
-                                 boolean enabled) {
-
-        btnPlay.setClickable(enabled);
-        btnPlay.setFocusable(enabled);
-
-        if (status == null) status = "closed";
+                                 String status) {
 
         switch (status.toLowerCase()) {
             case "open":
-                // Green play button
-                btnPlay.setCardBackgroundColor(0xFF4CAF50); // Green
-                btnPlay.setCardElevation(4f);
-                btnPlay.setAlpha(1f);
+            case "running":
+                btnPlay.setCardBackgroundColor(0xFF4CAF50);
                 imgIcon.setImageResource(R.drawable.ic_play);
-                imgIcon.setAlpha(1f);
                 break;
-
             case "upcoming":
-                // Orange clock button
-                btnPlay.setCardBackgroundColor(0xFFFF9800); // Orange
-                btnPlay.setCardElevation(4f);
-                btnPlay.setAlpha(1f);
+                btnPlay.setCardBackgroundColor(0xFFFF9800);
                 imgIcon.setImageResource(R.drawable.ic_clock);
-                imgIcon.setAlpha(1f);
                 break;
-
-            default: // closed
-                // Red pause button (disabled)
-                btnPlay.setCardBackgroundColor(0xFFD32F2F); // Red
-                btnPlay.setCardElevation(0f);
-                btnPlay.setAlpha(0.5f);
+            default:
+                btnPlay.setCardBackgroundColor(0xFFD32F2F);
                 imgIcon.setImageResource(R.drawable.ic_pause);
-                imgIcon.setAlpha(0.5f);
                 break;
         }
     }
@@ -226,7 +180,6 @@ public class GameTapAdapter
         return list == null ? 0 : list.size();
     }
 
-    // ================= HOLDER =================
     static class Holder extends RecyclerView.ViewHolder {
 
         MaterialCardView cardGame, cardStatus, btnPlay;
@@ -237,7 +190,6 @@ public class GameTapAdapter
 
         Holder(@NonNull View v) {
             super(v);
-
             cardGame = v.findViewById(R.id.cardGame);
             txtGameName = v.findViewById(R.id.txtGameName);
             txtResultCode = v.findViewById(R.id.txtResultCode);

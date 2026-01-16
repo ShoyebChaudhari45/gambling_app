@@ -54,6 +54,9 @@ public class TapsResponse {
     // ================= TAP =================
     public static class Tap {
 
+        @SerializedName("type")
+        private String type;
+
         @SerializedName("id")
         private int id;
 
@@ -66,9 +69,12 @@ public class TapsResponse {
         @SerializedName("status")
         private String status;
 
+        // ⭐ NEW: Result field
+        @SerializedName("result")
+        private String result;
+
         // Runtime fields
         private String gameName;
-        private String type;
 
         public int getId() {
             return id;
@@ -84,6 +90,11 @@ public class TapsResponse {
 
         public String getStatus() {
             return status;
+        }
+
+        // ⭐ NEW: Result getter
+        public String getResult() {
+            return result;
         }
 
         public String getGameName() {

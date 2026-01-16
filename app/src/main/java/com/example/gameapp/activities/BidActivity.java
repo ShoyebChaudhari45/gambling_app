@@ -38,6 +38,9 @@ public class BidActivity extends AppCompatActivity {
 
     private static final String TAG = "BidActivity";
 
+    private int openId = -1;
+    private int closeId = -1;
+
     private TextView txtTitle, txtBalance, txtCurrentDate;
     private ImageButton btnBack;
     private ImageView imgGameType;
@@ -47,8 +50,10 @@ public class BidActivity extends AppCompatActivity {
     private MaterialButton btnProceed;
     private MaterialCardView cardOpen, cardClose;
 
-    private String gameName, gameType, tapType, gameImage;
-    private int tapId;
+    private final int COLOR_BLUE = R.color.dark_blue;
+    private final int COLOR_GRAY = R.color.textSecondary;
+
+    private String gameName, gameType, gameImage;
     private boolean isOpenSelected = true;
 
     @Override
@@ -62,28 +67,25 @@ public class BidActivity extends AppCompatActivity {
         setupClickListeners();
     }
 
-    // ===================== INTENT =====================
     private void getIntentData() {
         gameName = getIntent().getStringExtra("game_name");
         gameType = getIntent().getStringExtra("game_type");
-        tapType  = getIntent().getStringExtra("tap_type");
         gameImage = getIntent().getStringExtra("game_image");
-        tapId = getIntent().getIntExtra("tap_id", -1);
+
+        openId = getIntent().getIntExtra("open_id", -1);
+        closeId = getIntent().getIntExtra("close_id", -1);
     }
 
-    // ===================== INIT =====================
     private void initViews() {
         btnBack = findViewById(R.id.btnBack);
         txtTitle = findViewById(R.id.txtTitle);
         txtBalance = findViewById(R.id.txtBalance);
         txtCurrentDate = findViewById(R.id.txtCurrentDate);
         imgGameType = findViewById(R.id.imgGameType);
-
         btnOpen = findViewById(R.id.btnOpen);
         btnClose = findViewById(R.id.btnClose);
         cardOpen = findViewById(R.id.cardOpen);
         cardClose = findViewById(R.id.cardClose);
-
         etDigits = findViewById(R.id.etDigits);
         etPoints = findViewById(R.id.etPoints);
         btnProceed = findViewById(R.id.btnProceed);
@@ -100,48 +102,90 @@ public class BidActivity extends AppCompatActivity {
         });
     }
 
-    // ===================== UI =====================
     private void setupUI() {
-        txtTitle.setText(gameType != null ? gameType : "Game");
+        txtTitle.setText(gameType);
         txtBalance.setText(String.valueOf(SessionManager.getBalance(this)));
         txtCurrentDate.setText(getCurrentDateFormatted());
 
-        if (gameImage != null && !gameImage.isEmpty()) {
-            Glide.with(this)
-                    .load(gameImage)
-                    .placeholder(R.drawable.ic_placeholder)
-                    .into(imgGameType);
+        if (gameImage != null)
+            Glide.with(this).load(gameImage).placeholder(R.drawable.ic_placeholder).into(imgGameType);
+
+        if (openId != -1) updateOpenCloseSelection(true);
+        else if (closeId != -1) updateOpenCloseSelection(false);
+
+        if (openId == -1) {
+            cardOpen.setEnabled(false);
+            cardOpen.setAlpha(0.5f);
+            btnOpen.setEnabled(false);
         }
 
-        updateOpenCloseSelection(true);
+        if (closeId == -1) {
+            cardClose.setEnabled(false);
+            cardClose.setAlpha(0.5f);
+            btnClose.setEnabled(false);
+        }
     }
 
     private void setupClickListeners() {
+
         btnBack.setOnClickListener(v -> finish());
 
+        // Card click
         cardOpen.setOnClickListener(v -> {
-            isOpenSelected = true;
-            updateOpenCloseSelection(true);
+            if (openId != -1) {
+                isOpenSelected = true;
+                updateOpenCloseSelection(true);
+            }
         });
 
         cardClose.setOnClickListener(v -> {
-            isOpenSelected = false;
-            updateOpenCloseSelection(false);
+            if (closeId != -1) {
+                isOpenSelected = false;
+                updateOpenCloseSelection(false);
+            }
+        });
+
+        // Radio click FIX 🔥
+        btnOpen.setOnClickListener(v -> {
+            if (openId != -1) {
+                isOpenSelected = true;
+                updateOpenCloseSelection(true);
+            }
+        });
+
+        btnClose.setOnClickListener(v -> {
+            if (closeId != -1) {
+                isOpenSelected = false;
+                updateOpenCloseSelection(false);
+            }
         });
 
         btnProceed.setOnClickListener(v -> validateAndConfirmBid());
     }
 
-    // ===================== OPEN / CLOSE =====================
     private void updateOpenCloseSelection(boolean isOpen) {
+
         if (isOpen) {
-            cardOpen.setCardBackgroundColor(getColor(R.color.dark_blue));
+            cardOpen.setCardBackgroundColor(getColor(COLOR_BLUE));
+            cardOpen.setCardElevation(4f);
             btnOpen.setChecked(true);
+            btnOpen.setTextColor(getColor(android.R.color.white));
+
+            cardClose.setCardBackgroundColor(getColor(android.R.color.white));
+            cardClose.setCardElevation(0f);
             btnClose.setChecked(false);
+            btnClose.setTextColor(getColor(COLOR_GRAY));
+
         } else {
-            cardClose.setCardBackgroundColor(getColor(R.color.dark_blue));
-            btnOpen.setChecked(false);
+            cardClose.setCardBackgroundColor(getColor(COLOR_BLUE));
+            cardClose.setCardElevation(4f);
             btnClose.setChecked(true);
+            btnClose.setTextColor(getColor(android.R.color.white));
+
+            cardOpen.setCardBackgroundColor(getColor(android.R.color.white));
+            cardOpen.setCardElevation(0f);
+            btnOpen.setChecked(false);
+            btnOpen.setTextColor(getColor(COLOR_GRAY));
         }
 
         CompoundButtonCompat.setButtonTintList(
@@ -150,11 +194,12 @@ public class BidActivity extends AppCompatActivity {
                 btnClose, ColorStateList.valueOf(getColor(android.R.color.white)));
     }
 
-    // ===================== VALIDATION + CONFIRMATION =====================
     private void validateAndConfirmBid() {
 
-        if (tapId == -1) {
-            toast("Invalid game time");
+        int selectedTapId = isOpenSelected ? openId : closeId;
+
+        if (selectedTapId == -1) {
+            toast(isOpenSelected ? "Open session not available" : "Close session not available");
             return;
         }
 
@@ -165,7 +210,6 @@ public class BidActivity extends AppCompatActivity {
             toast("Enter digits");
             return;
         }
-
         if (pointsStr.isEmpty()) {
             toast("Enter points");
             return;
@@ -179,12 +223,14 @@ public class BidActivity extends AppCompatActivity {
             return;
         }
 
-        String type = gameType;
+        if (points <= 0) {
+            toast("Points must be greater than 0");
+            return;
+        }
 
-        showConfirmationDialog(digits, points, type);
+        showConfirmationDialog(digits, points, gameType);
     }
 
-    // ===================== CONFIRMATION POPUP =====================
     private void showConfirmationDialog(String digits, int points, String type) {
 
         new AlertDialog.Builder(this)
@@ -196,59 +242,58 @@ public class BidActivity extends AppCompatActivity {
                                 "\nPoints: " + points +
                                 "\nSession: " + (isOpenSelected ? "OPEN" : "CLOSE")
                 )
-                .setPositiveButton("Confirm", (dialog, which) ->
-                        submitBid(digits, points, type)
-                )
+                .setPositiveButton("Confirm",
+                        (dialog, which) -> submitBid(digits, points, type))
                 .setNegativeButton("Cancel", null)
                 .show();
     }
 
-    // ===================== API =====================
     private void submitBid(String digits, int points, String type) {
 
+        int selectedTapId = isOpenSelected ? openId : closeId;
+
         LotteryRateRequest request = new LotteryRateRequest(
-                tapId,
+                selectedTapId,
                 type,
                 digits,
                 points
         );
 
-        ApiService api = ApiClient.getClient().create(ApiService.class);
+        ApiClient.getClient()
+                .create(ApiService.class)
+                .placeBid(
+                        "Bearer " + SessionManager.getToken(this),
+                        "application/json",
+                        request
+                )
+                .enqueue(new Callback<LotteryRateResponse>() {
 
-        api.placeBid(
-                "Bearer " + SessionManager.getToken(this),
-                "application/json",
-                request
-        ).enqueue(new Callback<LotteryRateResponse>() {
+                    @Override
+                    public void onResponse(Call<LotteryRateResponse> call,
+                                           Response<LotteryRateResponse> resp) {
 
-            @Override
-            public void onResponse(Call<LotteryRateResponse> call,
-                                   Response<LotteryRateResponse> response) {
-
-                if (response.isSuccessful() && response.body() != null) {
-                    // ✅ FIRST: Refresh wallet balance
-                    refreshWalletBalance(response.body().getMessage());
-                } else {
-                    try {
-                        String error = response.errorBody().string();
-                        Log.e(TAG, "Bid Error: " + error);
-                        toast("Bid failed");
-                    } catch (Exception e) {
-                        toast("Bid failed");
+                        if (resp.isSuccessful() && resp.body() != null) {
+                            refreshWalletBalance(resp.body().getMessage());
+                        } else {
+                            try {
+                                String error = resp.errorBody() != null
+                                        ? resp.errorBody().string()
+                                        : "Unknown error";
+                                toast("Bid failed: " + error);
+                            } catch (Exception e) {
+                                toast("Bid failed");
+                            }
+                        }
                     }
-                }
-            }
 
-            @Override
-            public void onFailure(Call<LotteryRateResponse> call, Throwable t) {
-                Log.e(TAG, "Network error", t);
-                toast("Network error");
-            }
-        });
+                    @Override
+                    public void onFailure(Call<LotteryRateResponse> call, Throwable t) {
+                        toast("Network error: " + t.getMessage());
+                    }
+                });
     }
 
-    // ===================== WALLET REFRESH + SUCCESS POPUP =====================
-    private void refreshWalletBalance(String bidMessage) {
+    private void refreshWalletBalance(String successMessage) {
 
         ApiClient.getClient()
                 .create(ApiService.class)
@@ -267,38 +312,29 @@ public class BidActivity extends AppCompatActivity {
                                 && response.body().data != null) {
 
                             int newBalance = response.body().data.balance;
-
-                            // ✅ Update SessionManager
                             SessionManager.saveBalance(BidActivity.this, newBalance);
-
-                            // ✅ Update UI
                             txtBalance.setText(String.valueOf(newBalance));
-
-                            // ✅ THEN: Show success popup with updated balance
-                            showSuccessDialog(bidMessage, newBalance);
-                        } else {
-                            // Fallback if API fails
-                            showSuccessDialog(bidMessage, SessionManager.getBalance(BidActivity.this));
                         }
+
+                        showSuccessDialog(successMessage);
                     }
 
                     @Override
                     public void onFailure(Call<UserDetailsResponse> call, Throwable t) {
-                        // Fallback if network fails
-                        showSuccessDialog(bidMessage, SessionManager.getBalance(BidActivity.this));
+                        showSuccessDialog(successMessage);
                     }
                 });
     }
 
-    // ===================== SUCCESS DIALOG =====================
-    private void showSuccessDialog(String message, int currentBalance) {
+    private void showSuccessDialog(String message) {
         new AlertDialog.Builder(this)
                 .setTitle("✅ Bid Success")
-                .setCancelable(true)   // user can tap outside to close
+                .setMessage(message)
+                .setPositiveButton("OK", (d, w) -> finish())
+                .setCancelable(false)
                 .show();
     }
 
-    // ===================== HELPERS =====================
     private String getCurrentDateFormatted() {
         return new SimpleDateFormat(
                 "EEE dd-MMM-yyyy",

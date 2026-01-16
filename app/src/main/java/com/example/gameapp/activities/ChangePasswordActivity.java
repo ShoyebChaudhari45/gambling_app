@@ -27,7 +27,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
     private static final String TAG = "CHANGE_PASSWORD";
 
     private EditText edtNewPassword, edtConfirmPassword;
-    private long lastBackPressedTime = 0;
+    private final long lastBackPressedTime = 0;
 
 
     @Override

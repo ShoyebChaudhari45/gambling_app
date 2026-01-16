@@ -8,9 +8,7 @@ public class GameApp extends Application {
     public void onCreate() {
         super.onCreate();
 
-        // ✅ App always LIGHT (even if system is dark)
-        AppCompatDelegate.setDefaultNightMode(
-                AppCompatDelegate.MODE_NIGHT_NO
-        );
+        // Force Light Mode globally
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
     }
 }

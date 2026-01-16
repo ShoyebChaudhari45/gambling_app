@@ -8,8 +8,8 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -52,6 +52,7 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
@@ -62,8 +63,6 @@ public class HomeActivity extends AppCompatActivity {
 
         loadUserDetails();
         loadGameTaps();
-
-        // ⭐ LOAD SUPPORT DATA TO GET WHATSAPP NUMBER
         loadSupportData();
     }
 
@@ -72,7 +71,6 @@ public class HomeActivity extends AppCompatActivity {
         navigationView = findViewById(R.id.navigationView);
         btnMenu = findViewById(R.id.btnMenu);
         rvGameTaps = findViewById(R.id.rvGameTaps);
-
         txtBalance = findViewById(R.id.txtBalance);
 
         View headerView = navigationView.getHeaderView(0);
@@ -88,26 +86,18 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setupRecyclerView() {
         rvGameTaps.setLayoutManager(new LinearLayoutManager(this));
-
-        gameTapAdapter = new GameTapAdapter(
-                this,
-                gameItems,
-                this::openGameSelection
-        );
+        gameTapAdapter = new GameTapAdapter(this, gameItems, this::openGameSelection);
         rvGameTaps.setAdapter(gameTapAdapter);
     }
 
     private void setupActionButtons() {
-        // ⭐ WHATSAPP BUTTON - Uses saved WhatsApp number
         findViewById(R.id.btnWhatsApp).setOnClickListener(v -> {
             String number = SessionManager.getSupportWhatsapp(this);
-
             if (number == null || number.isEmpty()) {
                 toast("Support WhatsApp number not available");
                 Log.w(TAG, "WhatsApp number not found in SessionManager");
                 return;
             }
-
             Log.d(TAG, "Opening WhatsApp with number: " + number);
             openWhatsApp(number);
         });
@@ -139,31 +129,22 @@ public class HomeActivity extends AppCompatActivity {
 
             if (id == R.id.nav_profile) {
                 startActivity(new Intent(this, ProfileActivity.class));
-
             } else if (id == R.id.nav_add_funds) {
                 startActivity(new Intent(this, AddPointsActivity.class));
-
             } else if (id == R.id.nav_withdraw) {
                 startActivity(new Intent(this, WithdrawActivity.class));
-
             } else if (id == R.id.nav_wallet) {
                 startActivity(new Intent(this, WalletStatementActivity.class));
-
             } else if (id == R.id.nav_bid_history) {
                 startActivity(new Intent(this, BidHistoryActivity.class));
-
             } else if (id == R.id.nav_game_rates) {
                 startActivity(new Intent(this, GameRatesActivity.class));
-
             } else if (id == R.id.nav_support) {
                 startActivity(new Intent(this, SupportActivity.class));
-
             } else if (id == R.id.nav_change_password) {
                 startActivity(new Intent(this, ChangePasswordActivity.class));
-
             } else if (id == R.id.nav_share) {
                 shareApp();
-
             } else if (id == R.id.nav_logout) {
                 SessionManager.logout(this);
                 startActivity(new Intent(this, LoginActivity.class));
@@ -174,7 +155,6 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
-    // ⭐ NEW METHOD: Load Support Data to get WhatsApp number
     private void loadSupportData() {
         String token = "Bearer " + SessionManager.getToken(this);
 
@@ -194,7 +174,6 @@ public class HomeActivity extends AppCompatActivity {
 
                             SupportResponse.SupportData supportData = response.body().getData();
 
-                            // ⭐ SAVE WHATSAPP NUMBER TO SESSION
                             if (supportData.hasValidWhatsapp()) {
                                 String whatsappNumber = supportData.getWhatsappNo();
                                 SessionManager.saveSupportWhatsapp(HomeActivity.this, whatsappNumber);
@@ -265,47 +244,97 @@ public class HomeActivity extends AppCompatActivity {
                         if (!response.isSuccessful()
                                 || response.body() == null
                                 || response.body().getData() == null) {
+                            Log.e(TAG, "Invalid API response");
                             return;
                         }
 
                         gameItems.clear();
 
                         for (TapsResponse.GameData game : response.body().getData()) {
+                            Log.d(TAG, "Processing game: " + game.getName());
 
                             TapsResponse.Tap openTap = null;
                             TapsResponse.Tap closeTap = null;
 
-                            if (game.getTimes() != null) {
-                                for (TapsResponse.Tap tap : game.getTimes()) {
+                            List<TapsResponse.Tap> times = game.getTimes();
 
-                                    tap.setGameName(game.getName());
+                            // ⭐ FIX: Use "type" field to identify open/close taps
+                            for (TapsResponse.Tap tap : times) {
+                                tap.setGameName(game.getName());
 
-                                    if ("open".equalsIgnoreCase(tap.getType())) {
-                                        openTap = tap;
-                                    } else if ("close".equalsIgnoreCase(tap.getType())) {
-                                        closeTap = tap;
-                                    }
+                                String type = tap.getType();
+                                String status = tap.getStatus();
+
+                                Log.d(TAG, game.getName() + " - Type: " + type + ", Status: " + status);
+
+                                if ("open".equalsIgnoreCase(type)) {
+                                    openTap = tap;
+                                } else if ("close".equalsIgnoreCase(type)) {
+                                    closeTap = tap;
                                 }
                             }
 
-                            gameItems.add(
-                                    new GameItem(
-                                            game.getName(),
-                                            openTap,
-                                            closeTap
-                                    )
-                            );
+                            // Fallback if type is missing
+                            if (openTap == null && times.size() > 0) {
+                                openTap = times.get(0);
+                                openTap.setGameName(game.getName());
+                            }
+                            if (closeTap == null && times.size() > 1) {
+                                closeTap = times.get(1);
+                                closeTap.setGameName(game.getName());
+                            }
+
+                            gameItems.add(new GameItem(
+                                    game.getName(),
+                                    openTap,
+                                    closeTap
+                            ));
                         }
 
                         sortGamesByStatus();
                         gameTapAdapter.notifyDataSetChanged();
+
+                        Log.d(TAG, "Total games loaded: " + gameItems.size());
                     }
 
                     @Override
                     public void onFailure(Call<TapsResponse> call, Throwable t) {
+                        Log.e(TAG, "Network error loading games", t);
                         toast("Network error");
                     }
                 });
+    }
+
+    // ⭐ FIX: Proper priority based on actual status
+    private int getGamePriority(GameItem item) {
+        TapsResponse.Tap openTap = item.getOpenTap();
+        TapsResponse.Tap closeTap = item.getCloseTap();
+
+        // Check both taps for "running" or "open" status
+        boolean hasOpen = false;
+        boolean hasUpcoming = false;
+
+        if (openTap != null) {
+            String status = openTap.getStatus();
+            if ("running".equalsIgnoreCase(status) || "open".equalsIgnoreCase(status)) {
+                hasOpen = true;
+            } else if ("upcoming".equalsIgnoreCase(status)) {
+                hasUpcoming = true;
+            }
+        }
+
+        if (closeTap != null) {
+            String status = closeTap.getStatus();
+            if ("running".equalsIgnoreCase(status) || "open".equalsIgnoreCase(status)) {
+                hasOpen = true;
+            } else if ("upcoming".equalsIgnoreCase(status)) {
+                hasUpcoming = true;
+            }
+        }
+
+        if (hasOpen) return 1;
+        if (hasUpcoming) return 2;
+        return 3; // closed
     }
 
     private void sortGamesByStatus() {
@@ -314,21 +343,23 @@ public class HomeActivity extends AppCompatActivity {
         );
     }
 
-    private int getGamePriority(GameItem item) {
-        String o = item.hasOpenTap() ? item.getOpenTap().getStatus() : null;
+    private void openGameSelection(TapsResponse.Tap openTap,
+                                   TapsResponse.Tap closeTap) {
 
-        if ("open".equalsIgnoreCase(o)) return 1;
-        if ("upcoming".equalsIgnoreCase(o)) return 2;
-        return 3;
-    }
-
-    private void openGameSelection(TapsResponse.Tap tap, String type) {
         Intent i = new Intent(this, GameTypesActivity.class);
-        i.putExtra("tap_id", tap.getId());
-        i.putExtra("tap_type", type);
-        i.putExtra("game_name", tap.getGameName());
-        i.putExtra("end_time", tap.getEndTime());
-        i.putExtra("status", tap.getStatus());
+
+        if (openTap != null) {
+            i.putExtra("open_id", openTap.getId());
+            i.putExtra("game_name", openTap.getGameName());
+        }
+
+        if (closeTap != null) {
+            i.putExtra("close_id", closeTap.getId());
+            if (!i.hasExtra("game_name")) {
+                i.putExtra("game_name", closeTap.getGameName());
+            }
+        }
+
         startActivityForResult(i, 101);
     }
 
@@ -347,10 +378,7 @@ public class HomeActivity extends AppCompatActivity {
     private void openWhatsApp(String number) {
         Log.d(TAG, "openWhatsApp called with: " + number);
         try {
-            // Remove all non-numeric characters except +
             String clean = number.replaceAll("[^0-9+]", "");
-
-            // Remove leading + if present for wa.me link
             if (clean.startsWith("+")) {
                 clean = clean.substring(1);
             }
@@ -389,10 +417,6 @@ public class HomeActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         updateBalanceUI();
-
-        // ⭐ OPTIONAL: Refresh support data when returning to home
-        // Uncomment if you want to always have latest WhatsApp number
-        // loadSupportData();
     }
 
     @Override

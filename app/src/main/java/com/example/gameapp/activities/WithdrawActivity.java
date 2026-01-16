@@ -35,7 +35,7 @@ public class WithdrawActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private ApiService apiService;
 
-    private long lastBackPressedTime = 0;
+    private final long lastBackPressedTime = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
