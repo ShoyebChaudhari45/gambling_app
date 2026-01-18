@@ -19,13 +19,10 @@ import com.example.gameapp.models.response.RegisterResponse;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.util.regex.Pattern;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import android.text.InputType;
-
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -41,8 +38,6 @@ public class RegisterActivity extends AppCompatActivity {
 
     private TextInputLayout tilName, tilMobile, tilEmail, tilPassword, tilReferralCode;
 
-    // 🔐 Password rule
-    // 🔐 Password rule (minimum 4 characters, anything allowed)
     private static final int MIN_PASSWORD_LENGTH = 4;
 
     @Override
@@ -60,7 +55,6 @@ public class RegisterActivity extends AppCompatActivity {
         txtLogin = findViewById(R.id.txtLogin);
         progressContainer = findViewById(R.id.progressContainer);
 
-        // 🔥 Get TextInputLayouts WITHOUT changing XML
         tilName = (TextInputLayout) edtName.getParent().getParent();
         tilMobile = (TextInputLayout) edtMobile.getParent().getParent();
         tilEmail = (TextInputLayout) edtEmail.getParent().getParent();
@@ -74,7 +68,6 @@ public class RegisterActivity extends AppCompatActivity {
         );
     }
 
-    // ================= REGISTER =================
     private void registerUser() {
 
         clearErrors();
@@ -85,32 +78,25 @@ public class RegisterActivity extends AppCompatActivity {
         String password = edtPassword.getText().toString().trim();
         String referralCode = edtReferralCode.getText().toString().trim();
 
-        // 👤 Name
         if (name.isEmpty()) {
             tilName.setError("Please enter your name");
             edtName.requestFocus();
             return;
         }
 
-        // 📱 Mobile
         if (!mobile.matches("^[6-9]\\d{9}$")) {
             tilMobile.setError("Enter valid 10-digit mobile number");
             edtMobile.requestFocus();
             return;
         }
 
-        // 📧 Email
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             tilEmail.setError("Enter a valid email address");
             edtEmail.requestFocus();
             return;
         }
 
-        // 🔐 Password validation with AUTO VISIBILITY
-        // 🔐 Password validation (MIN 4, ANYTHING ALLOWED)
         if (password.length() < MIN_PASSWORD_LENGTH) {
-
-            // 👁 Show password on error
             edtPassword.setInputType(
                     InputType.TYPE_CLASS_TEXT |
                             InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
@@ -122,18 +108,14 @@ public class RegisterActivity extends AppCompatActivity {
             return;
 
         } else {
-
-            // 🔒 Hide password when valid
             edtPassword.setInputType(
                     InputType.TYPE_CLASS_TEXT |
                             InputType.TYPE_TEXT_VARIATION_PASSWORD
             );
             edtPassword.setSelection(edtPassword.length());
-
             tilPassword.setError(null);
         }
 
-        // 👥 User type
         if (rgUserType.getCheckedRadioButtonId() == -1) {
             Toast.makeText(this, "Please select user type", Toast.LENGTH_SHORT).show();
             return;
@@ -148,7 +130,6 @@ public class RegisterActivity extends AppCompatActivity {
         request.password = password;
         request.status = "active";
 
-        // 🎁 Add referral code if provided
         if (!referralCode.isEmpty()) {
             request.referral_code = referralCode;
         }
@@ -166,10 +147,39 @@ public class RegisterActivity extends AppCompatActivity {
                 showLoader(false);
                 Log.d(TAG, "HTTP Code: " + response.code());
 
-                if (response.isSuccessful()) {
+                if (response.isSuccessful() && response.body() != null) {
                     toast("Registration successful");
                     startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
                     finish();
+                    return;
+                }
+
+                // ==================================
+                // 🔥 FIXED BACKEND VALIDATION CHECK
+                // ==================================
+                if (response.errorBody() != null) {
+                    try {
+                        String errorJson = response.errorBody().string().toLowerCase();
+                        Log.d(TAG, "Error Response: " + errorJson);
+
+                        if (errorJson.contains("email")) {
+                            tilEmail.setError("Email already exists");
+                            edtEmail.requestFocus();
+                            return;
+                        }
+
+                        if (errorJson.contains("mobile") || errorJson.contains("phone")) {
+                            tilMobile.setError("Mobile number already exists");
+                            edtMobile.requestFocus();
+                            return;
+                        }
+
+                        toast("Registration failed");
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        toast("Registration failed");
+                    }
                     return;
                 }
 
@@ -184,7 +194,6 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
-    // ================= HELPERS =================
     private void clearErrors() {
         tilName.setError(null);
         tilMobile.setError(null);
@@ -202,9 +211,6 @@ public class RegisterActivity extends AppCompatActivity {
         Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
     }
 
-    // 🔙 Double back press to exit
-
-
     @Override
     public void onBackPressed() {
 
@@ -214,7 +220,6 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        // First back press → go to Login
         Intent intent = new Intent(this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);

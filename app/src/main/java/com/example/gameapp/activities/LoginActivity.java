@@ -18,8 +18,6 @@ import com.example.gameapp.models.response.LoginResponse;
 import com.example.gameapp.session.SessionManager;
 import com.google.android.material.button.MaterialButton;
 
-import java.util.regex.Pattern;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -30,20 +28,12 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText edtMobile, edtPassword;
     private View progressContainer;
-    private final long lastBackPressedTime = 0;
-
-
-    // 🔐 Password rule:
-    // 1 uppercase, 1 lowercase, 1 number, 1 special char, min 8 chars
-    private static final Pattern PASSWORD_PATTERN = Pattern.compile(
-            "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&+=!]).{6,}$"
-    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // ✅ AUTO LOGIN
+        // Auto login
         if (SessionManager.isLoggedIn(this)) {
             startActivity(new Intent(this, HomeActivity.class));
             finish();
@@ -77,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
         String mobile = edtMobile.getText().toString().trim();
         String password = edtPassword.getText().toString().trim();
 
-        // 📱 Mobile validation
+        // Mobile validation
         if (mobile.isEmpty()) {
             toast("Please enter mobile number");
             return;
@@ -88,19 +78,9 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        // 🔐 Password validation
+        // Password validation (ONLY empty check)
         if (password.isEmpty()) {
             toast("Please enter password");
-            return;
-        }
-
-        if (!PASSWORD_PATTERN.matcher(password).matches()) {
-            toast("Password must contain:\n" +
-                    "• 1 uppercase letter\n" +
-                    "• 1 lowercase letter\n" +
-                    "• 1 number\n" +
-                    "• 1 special character\n" +
-                    "• Minimum 6 characters");
             return;
         }
 
@@ -123,26 +103,27 @@ public class LoginActivity extends AppCompatActivity {
 
                     String token = response.body().getToken();
 
+                    // If backend returns token → login success
                     if (token != null && !token.isEmpty()) {
                         SessionManager.saveLogin(LoginActivity.this, token);
                         startActivity(new Intent(LoginActivity.this, HomeActivity.class));
                         finish();
-                    } else {
-                        showLoader(false);
-                        toast("Invalid mobile number or password");
+                        return;
                     }
-
-                } else {
-                    showLoader(false);
-                    toast("Server error. Please try again");
                 }
+
+                // ❌ ANY failure = wrong password or mobile
+                showLoader(false);
+                toast("Invalid mobile number or password");
             }
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
                 showLoader(false);
                 Log.e(TAG, "Login failed", t);
-                toast("Network error. Check your internet connection");
+
+                // ❌ Network fail = still show wrong pass for security
+                toast("Invalid mobile number or password");
             }
         });
     }
@@ -155,11 +136,11 @@ public class LoginActivity extends AppCompatActivity {
     private void toast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
     }
+
     @Override
     public void onBackPressed() {
         finishAffinity();
         System.exit(0);
     }
-
 
 }

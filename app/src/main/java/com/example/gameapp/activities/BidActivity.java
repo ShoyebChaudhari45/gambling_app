@@ -86,20 +86,14 @@ public class BidActivity extends AppCompatActivity {
         btnClose = findViewById(R.id.btnClose);
         cardOpen = findViewById(R.id.cardOpen);
         cardClose = findViewById(R.id.cardClose);
-        etDigits = findViewById(R.id.etDigits);
         etPoints = findViewById(R.id.etPoints);
         btnProceed = findViewById(R.id.btnProceed);
+        etDigits = findViewById(R.id.etDigits);
 
         etDigits.setFilters(new InputFilter[]{
-                (source, start, end, dest, dstart, dend) -> {
-                    for (int i = start; i < end; i++) {
-                        if (!Character.isLetterOrDigit(source.charAt(i))) {
-                            return "";
-                        }
-                    }
-                    return null;
-                }
+                new InputFilter.LengthFilter(20) // allow everything up to 20 characters
         });
+
     }
 
     private void setupUI() {
